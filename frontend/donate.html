@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Donate - DonateEase</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-cover bg-center min-h-screen" style="background-image: url('https://images.unsplash.com/photo-1593113589675-77323c9fee28?q=80&w=2070&auto=format&fit=crop');">
+
+  <nav class="bg-green-700 bg-opacity-80 text-white px-6 py-4 flex justify-between items-center">
+    <h1 class="text-2xl font-bold">DonateEase</h1>
+    <div class="space-x-4">
+      <a href="index.html" class="hover:underline">Home</a>
+      <a href="../frontend/auth/login.html" class="hover:underline">Login</a>
+    </div>
+  </nav>
+
+  <div class="flex justify-center items-center py-10">
+    <form action="/submit-donation" method="POST" class="bg-white bg-opacity-90 p-8 rounded-lg shadow-lg max-w-6xl w-full grid grid-cols-1 md:grid-cols-2 gap-6">
+      
+      <div>
+        <h2 class="text-2xl font-bold mb-4">Food Details</h2>
+        
+        <label for="foodType" class="block font-medium">Food Type</label>
+        <select id="foodType" name="food_type" class="w-full p-2 border rounded mb-4" required>
+          <option>Fresh Produce</option>
+          <option>Canned Goods</option>
+          <option>Baked Items</option>
+          <option>Cooked Meals</option>
+          <option>Grains</option>
+
+        </select>
+
+        <label for="quantity" class="block font-medium">Quantity (servings)</label>
+        <input type="number" id="quantity" name="quantity" class="w-full p-2 border rounded mb-4" placeholder="Number of people this can serve" required>
+
+        <label for="expiry" class="block font-medium">Expiry Date/Time</label>
+        <input type="datetime-local" id="expiry" name="expiry_date" class="w-full p-2 border rounded mb-4" required>
+
+        <label for="description" class="block font-medium">Description</label>
+        <textarea id="description" name="description" class="w-full p-2 border rounded mb-4" placeholder="Describe the food items..."></textarea>
+      </div>
+
+      <div>
+        <h2 class="text-2xl font-bold mb-4">Pickup Information</h2>
+        
+        <label for="donorName" class="block font-medium">Donor Name/Organization</label>
+        <input type="text" id="donorName" name="donor_name" class="w-full p-2 border rounded mb-4" placeholder="Your name or organization" required>
+
+        <label for="phone" class="block font-medium">Phone Number</label>
+        <input type="tel" id="phone" name="phone_number" class="w-full p-2 border rounded mb-4" placeholder="Contact number" required>
+
+        <label for="address" class="block font-medium">Pickup Address</label>
+        <textarea id="address" name="pickup_address" class="w-full p-2 border rounded mb-4" placeholder="Full pickup address" required></textarea>
+
+        <label for="pickupTime" class="block font-medium">Available Pickup Times</label>
+        <input type="text" id="pickupTime" name="pickup_time" class="w-full p-2 border rounded mb-4" placeholder="e.g., 9AM - 6PM">
+
+        <button type="submit" class="w-full bg-gradient-to-r from-purple-500 to-indigo-500 text-white p-2 rounded-lg hover:opacity-90">
+          Submit Donation
+        </button>
+      </div>
+    </form>
+  </div>
+
+</body>
+</html>

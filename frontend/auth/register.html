@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DonateEase - Registration</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen flex flex-col">
+
+  <!-- Navbar -->
+  <nav class="bg-gray-900 text-white relative z-10 flex justify-between items-center px-8 py-5 shadow-md">
+    <div class="flex items-center space-x-2">
+      <img src="../assets/logo1.jpg" alt="Logo" class="w-10 h-10 animate-bounce">
+      <span class="text-3xl font-bold text-yellow-400">DonateEasy</span>
+    </div>
+    <div class="space-x-8 text-lg font-medium">
+      <a href="../index.html" class="hover:text-yellow-400 transition">Home</a>
+      <!-- <a href="../join-ngo.html" class="hover:text-yellow-400 transition">Join as NGO</a> -->
+      <!-- <a href="../about.html" class="hover:text-yellow-400 transition">About Us</a> -->
+      <a href="../contact.html" class="hover:text-yellow-400 transition">Contact Us</a>
+      <!-- <a href="login.html" class="hover:text-yellow-400 transition">Login / Register</a> -->
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <main class="flex-grow flex justify-center items-center px-4">
+    <div class="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
+      <h2 class="text-2xl font-bold text-center text-blue-600 mb-6">Register for DonateEase</h2>
+
+      <form id="registerForm">
+        <!-- Name -->
+        <div class="mb-4">
+          <label class="block text-gray-700 font-medium mb-2">Full Name</label>
+          <input type="text" id="name" class="w-full border border-gray-300 p-2 rounded-lg focus:ring-2 focus:ring-blue-400" placeholder="Enter your name" required>
+        </div>
+
+        <!-- Email -->
+        <div class="mb-4">
+          <label class="block text-gray-700 font-medium mb-2">Email</label>
+          <input type="email" id="email" class="w-full border border-gray-300 p-2 rounded-lg focus:ring-2 focus:ring-blue-400" placeholder="Enter your email" required>
+        </div>
+
+        <!-- Password -->
+        <div class="mb-4">
+          <label class="block text-gray-700 font-medium mb-2">Password</label>
+          <input type="password" id="password" class="w-full border border-gray-300 p-2 rounded-lg focus:ring-2 focus:ring-blue-400" placeholder="Enter password" required>
+        </div>
+
+        <!-- Role Selection -->
+        <div class="mb-4">
+          <label class="block text-gray-700 font-medium mb-2">Register As</label>
+          <select id="role" class="w-full border border-gray-300 p-2 rounded-lg focus:ring-2 focus:ring-blue-400" required>
+            <option value="">-- Select Role --</option>
+            <option value="donor">Donor</option>
+            <option value="ngo">NGO</option>
+          </select>
+        </div>
+
+        <!-- Submit -->
+        <button type="submit" class="w-full bg-blue-500 text-white p-2 rounded-lg hover:bg-blue-600">
+          Register
+        </button>
+      </form>
+
+      <p class="mt-4 text-sm text-gray-600 text-center">
+        Already have an account?
+        <a href="login.html" class="text-blue-500 hover:underline">Login here</a>
+      </p>
+    </div>
+  </main>
+
+  <!-- Script -->
+  <script>
+    document.getElementById('registerForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      alert('Registration Successful! Redirecting to login...');
+      window.location.href = "login.html";
+    });
+  </script>
+
+</body>
+</html>

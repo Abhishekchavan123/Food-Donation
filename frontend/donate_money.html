@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Donate Money - DonateEasy</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- QR generator (for fallback) -->
+  <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script>
+</head>
+<body class="bg-gray-100">
+
+  <!-- Header -->
+  <header class="bg-green-600 text-white py-4 shadow-md">
+    <div class="max-w-6xl mx-auto px-4 flex justify-between items-center">
+      <h1 class="text-2xl font-bold">DonateEasy</h1>
+      <a href="index.html" class="bg-white text-green-700 px-4 py-2 rounded-lg font-semibold hover:bg-gray-200">
+        ⬅ Back to Home
+      </a>
+    </div>
+  </header>
+
+  <!-- Donation Card -->
+  <section class="max-w-3xl mx-auto mt-10 bg-white p-8 rounded-2xl shadow-lg">
+    <h2 class="text-3xl font-bold text-center text-gray-800 mb-2">💳 Donate Money</h2>
+    <p class="text-center text-gray-600 mb-8">Every ₹ you give turns into real meals. Thank you. 🙏</p>
+
+    <form id="donationForm" class="space-y-6" onsubmit="return false;">
+      <!-- Name -->
+      <div>
+        <label class="block text-gray-700 font-medium mb-2">Full Name</label>
+        <input id="donorName" type="text" placeholder="Enter your name" required
+          class="w-full border border-gray-300 px-4 py-3 rounded-lg focus:ring-2 focus:ring-green-500 outline-none">
+      </div>
+
+      <!-- Email -->
+      <div>
+        <label class="block text-gray-700 font-medium mb-2">Email</label>
+        <input id="donorEmail" type="email" placeholder="Enter your email" required
+          class="w-full border border-gray-300 px-4 py-3 rounded-lg focus:ring-2 focus:ring-green-500 outline-none">
+      </div>
+
+      <!-- Amount -->
+      <div>
+        <label class="block text-gray-700 font-medium mb-2">Donation Amount (₹)</label>
+        <input id="amount" type="number" placeholder="Enter amount" required min="10" step="1"
+          class="w-full border border-gray-300 px-4 py-3 rounded-lg focus:ring-2 focus:ring-green-500 outline-none">
+        <p class="text-sm text-gray-500 mt-1">Minimum ₹10. Use whole rupees (no paise).</p>
+      </div>
+
+      <!-- Payment Method -->
+      <div>
+        <label class="block text-gray-700 font-medium mb-2">Payment Method</label>
+        <select id="paymentMethod"
+          class="w-full border border-gray-300 px-4 py-3 rounded-lg focus:ring-2 focus:ring-green-500 outline-none">
+          <option value="">Select a method</option>
+          <option value="upi">UPI (GPay, PhonePe, Paytm)</option>
+          <option value="card" disabled>Card (Use gateway)</option>
+          <option value="netbanking" disabled>Net Banking (Use gateway)</option>
+        </select>
+      </div>
+
+      <!-- UPI app chooser (appears when UPI selected) -->
+      <div id="upiChooser" class="hidden">
+        <label class="block text-gray-700 font-medium mb-3">Choose UPI App</label>
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          <button type="button" data-app="gpay"
+            class="upi-btn bg-white border rounded-xl px-3 py-3 hover:bg-gray-50 shadow-sm">🟦 Google Pay</button>
+          <button type="button" data-app="phonepe"
+            class="upi-btn bg-white border rounded-xl px-3 py-3 hover:bg-gray-50 shadow-sm">🟪 PhonePe</button>
+          <button type="button" data-app="paytm"
+            class="upi-btn bg-white border rounded-xl px-3 py-3 hover:bg-gray-50 shadow-sm">🟦 Paytm</button>
+          <button type="button" data-app="bhim"
+            class="upi-btn bg-white border rounded-xl px-3 py-3 hover:bg-gray-50 shadow-sm">🟩 BHIM / Others</button>
+        </div>
+
+        <!-- Helper actions -->
+        <div class="mt-4 flex flex-wrap items-center gap-3">
+          <button id="showQrBtn" type="button"
+            class="text-sm underline text-green-700 hover:text-green-800">Having trouble? Show QR</button>
+          <button id="copyLinkBtn" type="button"
+            class="text-sm underline text-gray-700 hover:text-gray-900">Copy UPI Link</button>
+          <button id="copyVpaBtn" type="button"
+            class="text-sm underline text-gray-700 hover:text-gray-900">Copy UPI ID</button>
+        </div>
+      </div>
+
+      <!-- QR Fallback -->
+      <div id="qrWrap" class="hidden mt-6 p-4 border rounded-xl bg-gray-50">
+        <p class="text-gray-700 mb-3 font-medium">Scan this UPI QR with any app:</p>
+        <div class="flex items-center gap-6">
+          <canvas id="qrCanvas" class="bg-white p-2 rounded-md shadow"></canvas>
+          <div>
+            <p class="text-sm text-gray-600">If the app didn’t open automatically, scan from another phone.</p>
+            <p class="text-sm text-gray-600 mt-2"><span class="font-semibold">UPI ID:</span> <span id="vpaLabel"></span></p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Final CTA for non-UPI (disabled) -->
+      <div class="text-center">
+        <button> disabled
+          class="bg-green-600 text-white px-8 py-3 rounded-xl font-bold opacity-50 cursor-not-allowed">
+          Proceed to Pay
+        </button>
+        <p class="text-xs text-gray-500 mt-2">For cards/net banking, integrate a gateway (e.g., Razorpay). UPI works now.</p>
+      </div>
+    </form>
+  </section>
+
+  <footer class="mt-12 bg-gray-800 text-gray-200 py-6 text-center">
+    <p>© 2025 DonateEasy. All rights reserved.</p>
+  </footer>
+
+  <script>
+    // === CONFIG: Replace with your real details ===
+    const MERCHANT_VPA   = "donateeasy@upi";     // ← your UPI ID (receiver)
+    const MERCHANT_NAME  = "DonateEasy";         // ← receiver name (shown to payer)
+    const DEFAULT_NOTE   = "Donation to DonateEasy";
+
+    // === Helpers ===
+    const $ = (sel) => document.querySelector(sel);
+    const paymentMethod = $("#paymentMethod");
+    const upiChooser = $("#upiChooser");
+    const amountInput = $("#amount");
+    const donorName = $("#donorName");
+    const showQrBtn = $("#showQrBtn");
+    const copyLinkBtn = $("#copyLinkBtn");
+    const copyVpaBtn = $("#copyVpaBtn");
+    const qrWrap = $("#qrWrap");
+    const qrCanvas = $("#qrCanvas");
+    const vpaLabel = $("#vpaLabel");
+
+    const APP_PACKAGES = {
+      gpay:    "com.google.android.apps.nbu.paisa.user",
+      phonepe: "com.phonepe.app",
+      paytm:   "net.one97.paytm",
+      bhim:    "" // generic UPI handler
+    };
+
+    function sanitizeAmount(v){
+      const n = Number(v);
+      if (!Number.isFinite(n) || n <= 0) return null;
+      // UPI: keep to 2 decimals max; but we force integer INR for simplicity
+      return Math.round(n).toString();
+    }
+
+    function buildUpiUri({amount, note}) {
+      const params = new URLSearchParams({
+        pa: MERCHANT_VPA,
+        pn: MERCHANT_NAME,
+        am: amount,
+        cu: "INR",
+        tn: note || DEFAULT_NOTE
+      });
+      return `upi://pay?${params.toString()}`;
+    }
+
+    function buildAndroidIntent({amount, note, pkg}) {
+      const qs = new URLSearchParams({
+        pa: MERCHANT_VPA,
+        pn: MERCHANT_NAME,
+        am: amount,
+        cu: "INR",
+        tn: note || DEFAULT_NOTE
+      }).toString();
+      // Open a specific UPI app via package (Android only)
+      return `intent://pay?${qs}#Intent;scheme=upi;package=${pkg};end`;
+    }
+
+    function isAndroid() {
+      return /Android/i.test(navigator.userAgent);
+    }
+
+    function getNote() {
+      const name = donorName.value.trim();
+      return name ? `${DEFAULT_NOTE} - ${name}` : DEFAULT_NOTE;
+    }
+
+    function openUpi(appKey){
+      const amt = sanitizeAmount(amountInput.value);
+      if (!amt || Number(amt) < 10) {
+        alert("Enter a valid amount (minimum ₹10).");
+        return;
+      }
+
+      const note = getNote();
+      const genericUpi = buildUpiUri({amount: amt, note});
+
+      // iOS and desktop: try generic UPI link
+      if (!isAndroid() || !APP_PACKAGES[appKey]) {
+        // Attempt to open the UPI handler
+        window.location.href = genericUpi;
+        // Also prep QR fallback text
+        prepareQr(genericUpi);
+        return;
+      }
+
+      // Android: use package-targeted intent first, then fallback
+      const intentUrl = buildAndroidIntent({amount: amt, note, pkg: APP_PACKAGES[appKey]});
+      // Try to open the chosen app
+      window.location.href = intentUrl;
+
+      // Fallback to generic UPI after a short delay (if package not installed)
+      setTimeout(() => {
+        window.location.href = genericUpi;
+      }, 1200);
+
+      // Prepare QR for manual fallback
+      prepareQr(genericUpi);
+    }
+
+    function prepareQr(upiUri){
+      vpaLabel.textContent = MERCHANT_VPA;
+      // Render QR code
+      if (window.QRCode) {
+        QRCode.toCanvas(qrCanvas, upiUri, { width: 180 }, function (error) {
+          if (error) console.error(error);
+        });
+      }
+    }
+
+    // === UI wiring ===
+    paymentMethod.addEventListener("change", () => {
+      if (paymentMethod.value === "upi") {
+        upiChooser.classList.remove("hidden");
+      } else {
+        upiChooser.classList.add("hidden");
+        qrWrap.classList.add("hidden");
+      }
+    });
+
+    // Attach click handlers to UPI app buttons
+    document.querySelectorAll(".upi-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const appKey = btn.getAttribute("data-app");
+        openUpi(appKey);
+      });
+    });
+
+    // Toggle QR
+    showQrBtn.addEventListener("click", () => {
+      const amt = sanitizeAmount(amountInput.value);
+      if (!amt || Number(amt) < 10) {
+        alert("Enter a valid amount (minimum ₹10) before generating QR.");
+        return;
+      }
+      const note = getNote();
+      const genericUpi = buildUpiUri({amount: amt, note});
+      prepareQr(genericUpi);
+      qrWrap.classList.remove("hidden");
+      // Scroll into view for convenience
+      qrWrap.scrollIntoView({ behavior: "smooth", block: "center" });
+    });
+
+    // Copy UPI link to clipboard
+    copyLinkBtn.addEventListener("click", async () => {
+      const amt = sanitizeAmount(amountInput.value || "0");
+      const note = getNote();
+      const upi = buildUpiUri({amount: amt || "0", note});
+      try {
+        await navigator.clipboard.writeText(upi);
+        alert("UPI link copied.");
+      } catch {
+        alert("Copy failed. Long-press the link field if needed.");
+      }
+    });
+
+    // Copy VPA
+    copyVpaBtn.addEventListener("click", async () => {
+      try {
+        await navigator.clipboard.writeText(MERCHANT_VPA);
+        alert("UPI ID copied.");
+      } catch {
+        alert("Copy failed.");
+      }
+    });
+  </script>
+</body>
+</html>

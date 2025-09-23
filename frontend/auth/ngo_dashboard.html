@@ -1,0 +1,405 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>DonateEasy - NGO Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head> 
+<body class="bg-gray-50 min-h-screen">
+
+  <!-- Top bar -->
+  <header class="bg-white shadow-sm">
+    <div class="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <img src="../assets/logo1.jpg" alt="logo" class="w-10 h-10">
+        <h1 class="text-2xl font-bold text-yellow-400">DonateEasy</h1>
+      </div>
+      <div class="text-sm text-gray-700">
+        <span id="userName" class="font-medium"></span>
+        <span class="mx-2">•</span>
+        <button id="signoutBtn" class="text-xs text-red-500 hover:underline">Sign out</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-5xl mx-auto px-6 py-8">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+      <!-- Left column: NGO actions -->
+      <aside class="col-span-1 bg-white rounded-lg p-4 shadow">
+        <h2 class="text-lg font-semibold mb-3">NGO Dashboard</h2>
+        <p class="text-sm text-gray-600 mb-4">
+          Manage your NGO account — or switch to donor mode to list leftover food.
+        </p>
+
+        <button id="switchToDonor" class="w-full bg-yellow-400 text-black font-semibold py-2 rounded-lg hover:bg-yellow-500 transition mb-3">
+          Need to donate food? Switch to Donor Mode
+        </button>
+
+        <div id="ngoActions">
+          <h3 class="text-sm font-medium text-gray-800 mb-2">NGO Links</h3>
+          <ul class="text-sm space-y-2">
+            <li><a href="#" class="text-blue-600 hover:underline">View Claims</a></li>
+            <li><a href="#" class="text-blue-600 hover:underline">Manage Volunteers</a></li>
+            <li><a href="#" class="text-blue-600 hover:underline">Edit Profile</a></li>
+          </ul>
+        </div>
+
+        <div class="mt-6">
+          <h3 class="text-sm font-medium text-gray-800">Your Recent Donations</h3>
+          <ul id="yourDonations" class="mt-2 space-y-2 text-sm text-gray-700"></ul>
+        </div>
+      </aside>
+
+      <!-- Center column: Donor / Donation form -->
+      <section class="col-span-2">
+        <!-- Donor form -->
+        <div id="donorPanel" class="bg-white rounded-lg p-6 shadow hidden">
+          <div class="flex items-center justify-between mb-4">
+            <h2 class="text-xl font-semibold">Donate Food (Donor Mode)</h2>
+            <button id="backToNgo" class="text-sm text-blue-600 hover:underline">Back to NGO</button>
+          </div>
+
+          <form id="donationForm" class="space-y-4">
+            <div>
+              <label class="block text-sm font-medium">Food Title</label>
+              <input type="text" id="foodTitle" class="w-full mt-1 border rounded px-3 py-2" required>
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium">Description</label>
+              <textarea id="foodDesc" rows="3" class="w-full mt-1 border rounded px-3 py-2" placeholder="E.g. 10 plates of vegetable biryani" required></textarea>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+              <div>
+                <label class="block text-sm font-medium">Quantity</label>
+                <input type="text" id="quantity" class="w-full mt-1 border rounded px-3 py-2" placeholder="e.g. 10 plates" required>
+              </div>
+              <div>
+                <label class="block text-sm font-medium">Expiry / Best Before</label>
+                <input type="datetime-local" id="expiry" class="w-full mt-1 border rounded px-3 py-2" required>
+              </div>
+              <div>
+                <label class="block text-sm font-medium">Pickup Address</label>
+                <input type="text" id="pickupAddr" class="w-full mt-1 border rounded px-3 py-2" placeholder="Street, area, city" required>
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium">Photos (optional)</label>
+              <input type="file" id="photos" accept="image/*" multiple class="mt-1">
+              <div id="photoPreview" class="flex gap-2 mt-2 flex-wrap"></div>
+            </div>
+
+            <div class="flex items-center gap-3">
+              <button type="submit" class="bg-green-600 text-white px-4 py-2 rounded font-semibold hover:bg-green-700">List Donation</button>
+              <button type="button" id="openMapBtn" class="text-sm text-blue-600 hover:underline">Open pickup address in Google Maps</button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Donations list -->
+        <div id="donationsListContainer" class="bg-white rounded-lg p-6 shadow mt-4">
+          <h2 class="text-xl font-semibold mb-4">Available Donations</h2>
+          <div id="donationsList" class="grid gap-4"></div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <!-- NGO Pickup List Section -->
+  <section class="p-6 bg-gray-100 min-h-screen">
+    <h1 class="text-3xl font-bold mb-6">NGO Pickup List</h1>
+    <div id="pickup-list" class="space-y-4"></div>
+  </section>
+
+  <!-- Main Script -->
+  <script>
+    // All your existing JS code for user data, donation listing, claiming, etc.
+    function getCurrentUser() {
+      try {
+        const raw = localStorage.getItem('de_authUser');
+        if (raw) return JSON.parse(raw);
+      } catch (e) {}
+      return { fullName: 'Demo NGO', email: 'demo@ngo.org', role: 'ngo' };
+    }
+    const currentUser = getCurrentUser();
+    document.getElementById('userName').textContent = currentUser.fullName + ' (' + currentUser.role + ')';
+
+    const STORAGE_KEY = 'de_donations';
+    function loadDonations() {
+      try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); }
+      catch (e) { return []; }
+    }
+    function saveDonations(list) { localStorage.setItem(STORAGE_KEY, JSON.stringify(list)); }
+
+    const donorPanel = document.getElementById('donorPanel');
+    document.getElementById('switchToDonor').addEventListener('click', () => { donorPanel.classList.remove('hidden'); donorPanel.scrollIntoView({behavior:'smooth'}); });
+    document.getElementById('backToNgo').addEventListener('click', () => donorPanel.classList.add('hidden'));
+
+    const donationForm = document.getElementById('donationForm');
+    const photoInput = document.getElementById('photos');
+    const photoPreview = document.getElementById('photoPreview');
+    const donationsListEl = document.getElementById('donationsList');
+    const yourDonationsEl = document.getElementById('yourDonations');
+    const openMapBtn = document.getElementById('openMapBtn');
+
+    photoInput.addEventListener('change', async (e) => {
+      photoPreview.innerHTML = '';
+      const files = Array.from(e.target.files || []);
+      for (const f of files.slice(0,6)) {
+        const url = await fileToDataURL(f);
+        const img = document.createElement('img');
+        img.src = url;
+        img.className = 'w-24 h-16 object-cover rounded border';
+        photoPreview.appendChild(img);
+      }
+    });
+
+    donationForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const title = document.getElementById('foodTitle').value.trim();
+      const desc = document.getElementById('foodDesc').value.trim();
+      const qty = document.getElementById('quantity').value.trim();
+      const expiry = document.getElementById('expiry').value;
+      const pickupAddr = document.getElementById('pickupAddr').value.trim();
+      const files = Array.from(photoInput.files || []);
+      if (!title || !qty || !expiry || !pickupAddr) {
+        alert('Please fill required fields.');
+        return;
+      }
+      const photos = await Promise.all(files.slice(0,6).map(fileToDataURL));
+      const donations = loadDonations();
+      const donation = {
+        id: 'don_' + Date.now(),
+        donorName: currentUser.fullName,
+        donorEmail: currentUser.email,
+        donorRole: currentUser.role || 'ngo',
+        title,
+        description: desc,
+        quantity: qty,
+        expiry,
+        pickupAddress: pickupAddr,
+        photos,
+        status: 'available',
+        claimedBy: null,
+        liveLocation: null,
+        createdAt: new Date().toISOString()
+      };
+      donations.unshift(donation);
+      saveDonations(donations);
+      donationForm.reset();
+      photoPreview.innerHTML = '';
+      donorPanel.classList.add('hidden');
+      renderDonations();
+      alert('Donation listed successfully!');
+    });
+
+    function fileToDataURL(file) {
+      return new Promise((res, rej) => {
+        const reader = new FileReader();
+        reader.onload = () => res(reader.result);
+        reader.onerror = rej;
+        reader.readAsDataURL(file);
+      });
+    }
+
+    openMapBtn.addEventListener('click', () => {
+      const addr = document.getElementById('pickupAddr').value.trim();
+      if (!addr) { alert('Enter pickup address first.'); return; }
+      window.open('https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(addr), '_blank');
+    });
+
+    function renderDonations() {
+      const donations = loadDonations();
+      donationsListEl.innerHTML = '';
+      yourDonationsEl.innerHTML = '';
+      if (donations.length === 0) {
+        donationsListEl.innerHTML = '<p class="text-sm text-gray-500">No donations yet.</p>';
+        return;
+      }
+      donations.forEach(d => {
+        const card = document.createElement('div');
+        card.className = 'border rounded-lg p-4 bg-white shadow-sm grid md:grid-cols-5 gap-4 items-start';
+
+        const left = document.createElement('div');
+        left.className = 'md:col-span-3';
+        left.innerHTML = `
+          <div class="flex items-center justify-between">
+            <div>
+              <h3 class="font-semibold text-lg">${escapeHtml(d.title)}</h3>
+              <p class="text-xs text-gray-500">By: ${escapeHtml(d.donorName)} • ${d.donorRole}</p>
+            </div>
+            <div class="text-right text-xs text-gray-500">
+              <div>Qty: ${escapeHtml(d.quantity)}</div>
+              <div>Expiry: ${formatLocalDate(d.expiry)}</div>
+            </div>
+          </div>
+          <p class="mt-3 text-sm text-gray-700">${escapeHtml(d.description || '—')}</p>
+          <p class="mt-2 text-sm"><strong>Pickup:</strong> <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(d.pickupAddress)}" target="_blank" class="text-blue-600 hover:underline">${escapeHtml(d.pickupAddress)}</a></p>
+        `;
+
+        const right = document.createElement('div');
+        right.className = 'md:col-span-2 flex flex-col items-end gap-3';
+
+        if (d.photos && d.photos.length) {
+          const wrap = document.createElement('div');
+          wrap.className = 'flex gap-2';
+          d.photos.slice(0,4).forEach(p => {
+            const img = document.createElement('img');
+            img.src = p;
+            img.className = 'w-20 h-12 object-cover rounded border';
+            wrap.appendChild(img);
+          });
+          right.appendChild(wrap);
+        }
+
+        if (d.status === 'available') {
+          const btn = document.createElement('button');
+          btn.className = 'bg-yellow-400 px-3 py-2 rounded font-semibold hover:bg-yellow-500';
+          btn.textContent = 'Claim';
+          btn.addEventListener('click', () => claimDonation(d.id));
+          right.appendChild(btn);
+        } else {
+          const txt = document.createElement('div');
+          txt.className = 'text-sm text-gray-600';
+          txt.innerHTML = `<strong>Claimed</strong><div class="text-xs text-gray-500">by ${escapeHtml(d.claimedBy)}</div>`;
+          right.appendChild(txt);
+
+          if (d.liveLocation) {
+            const viewBtn = document.createElement('a');
+            viewBtn.href = `https://www.google.com/maps?q=${d.liveLocation.lat},${d.liveLocation.lng}`;
+            viewBtn.target = "_blank";
+            viewBtn.className = 'text-xs text-blue-600 hover:underline';
+            viewBtn.textContent = 'View Live Location';
+            right.appendChild(viewBtn);
+          }
+
+          if (d.claimedBy === currentUser.fullName) {
+            const unbtn = document.createElement('button');
+            unbtn.className = 'text-xs text-red-500 hover:underline';
+            unbtn.textContent = 'Release Claim';
+            unbtn.addEventListener('click', () => releaseClaim(d.id));
+            right.appendChild(unbtn);
+
+            const trackBtn = document.createElement('button');
+            trackBtn.className = 'text-xs text-green-600 hover:underline';
+            trackBtn.textContent = 'Start Pickup Tracking';
+            trackBtn.addEventListener('click', () => startTracking(d.id));
+            right.appendChild(trackBtn);
+          }
+        }
+
+        card.appendChild(left);
+        card.appendChild(right);
+        donationsListEl.appendChild(card);
+
+        if (d.donorEmail === currentUser.email) {
+          const li = document.createElement('li');
+          li.className = 'text-xs';
+          li.innerHTML = `<strong>${escapeHtml(d.title)}</strong> • ${formatLocalDate(d.expiry)} • ${d.status}`;
+          yourDonationsEl.appendChild(li);
+        }
+      });
+    }
+
+    function claimDonation(id) {
+      const donations = loadDonations();
+      const idx = donations.findIndex(x => x.id === id);
+      if (idx === -1) return alert('Donation not found.');
+      if (donations[idx].status !== 'available') return alert('Already claimed.');
+      donations[idx].status = 'claimed';
+      donations[idx].claimedBy = currentUser.fullName;
+      donations[idx].claimedAt = new Date().toISOString();
+      donations[idx].liveLocation = null;
+      saveDonations(donations);
+      renderDonations();
+      alert('Donation claimed! Contact donor to arrange pickup.');
+    }
+
+    function releaseClaim(id) {
+      const donations = loadDonations();
+      const idx = donations.findIndex(x => x.id === id);
+      if (idx === -1) return;
+      if (donations[idx].claimedBy !== currentUser.fullName) return alert('You did not claim this item.');
+      donations[idx].status = 'available';
+      donations[idx].claimedBy = null;
+      donations[idx].liveLocation = null;
+      saveDonations(donations);
+      renderDonations();
+    }
+
+    function startTracking(id) {
+      if (!navigator.geolocation) return alert('Geolocation not supported.');
+      alert('Tracking started! Updating every 10 seconds.');
+      navigator.geolocation.watchPosition(
+        (pos) => {
+          const donations = loadDonations();
+          const idx = donations.findIndex(x => x.id === id);
+          if (idx !== -1) {
+            donations[idx].liveLocation = {
+              lat: pos.coords.latitude,
+              lng: pos.coords.longitude,
+              updatedAt: new Date().toISOString()
+            };
+            saveDonations(donations);
+            renderDonations();
+          }
+        },
+        (err) => { console.error(err); alert('Unable to fetch location.'); },
+        { enableHighAccuracy: true, maximumAge: 0, timeout: 10000 }
+      );
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str).replace(/[&<>"'`=\/]/g, s => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;',
+        "'": '&#39;', '/': '&#x2F;', '`': '&#x60;', '=': '&#x3D;'
+      })[s]);
+    }
+
+    function formatLocalDate(s) {
+      if (!s) return '—';
+      let d = new Date(s);
+      return d.toLocaleString();
+    }
+
+    document.getElementById('signoutBtn').addEventListener('click', () => {
+      localStorage.removeItem('de_authUser');
+      location.reload();
+    });
+
+    // NGO Pickup List Example Data
+    const pickups = [
+      { id: 1, donorName: 'Hotel Sunshine', address: '123 Street', status: 'Pending' },
+      { id: 2, donorName: 'Restaurant Blue', address: '456 Avenue', status: 'Accepted' }
+    ];
+    const listContainer = document.getElementById('pickup-list');
+    pickups.forEach(pickup => {
+      const div = document.createElement('div');
+      div.className = "p-4 bg-white rounded shadow";
+      div.innerHTML = `
+        <h2 class="font-semibold text-xl">${pickup.donorName}</h2>
+        <p>
+          <strong>Address:</strong> ${pickup.address} <br>
+          <strong>Status:</strong> ${pickup.status}
+        </p>
+        <button class="mt-2 bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600" id="pickupBtn">Request Pickup</button>
+      `;
+      listContainer.appendChild(div);
+      div.querySelector('#pickupBtn').addEventListener('click', () => {
+        let confirmPickup = confirm(`Pickup from ${pickup.donorName} at ${pickup.address}. Are you available?`);
+        if (confirmPickup) {
+          alert("You have requested the pickup. NGO will contact you shortly!");
+        } else {
+          alert("You declined the pickup request.");
+        }
+      });
+    });
+
+  </script>
+</body>;
+

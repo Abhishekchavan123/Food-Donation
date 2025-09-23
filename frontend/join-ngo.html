@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NGO Volunteer Registration</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-900 text-white" style="background-image: url('./assets/volunteer11.png'); background-size: cover; background-position: center;">
+
+  <!-- Navbar -->
+  <nav class="bg-black bg-opacity-70 px-6 py-4 flex justify-between items-center">
+    <a href="index.html" class="text-2xl font-bold hover:text-yellow-400">DonateEasy</a>
+    <ul class="flex space-x-6">
+      <li><a href="#form" class="hover:text-yellow-400">Join as Volunteer</a></li>
+    </ul>
+  </nav>
+
+  <!-- Main Container -->
+  <div class="min-h-screen flex justify-center items-center px-4">
+    <div id="form" class="bg-black bg-opacity-70 p-8 rounded-2xl max-w-4xl w-full shadow-lg">
+      <h2 class="text-3xl font-bold mb-6 text-center">Volunteer Registration</h2>
+
+      <!-- About Section -->
+      <div class="mb-6 space-y-4">
+        <p>
+          Non-Governmental Organizations (NGOs) play a vital role in addressing social challenges, from hunger and homelessness to education and disaster relief.
+          These organizations rely heavily on the compassion and dedication of volunteers who are willing to give their time and energy for the greater good.
+        </p>
+        <p>
+          By volunteering with an NGO, you're not just helping others — you're becoming part of a larger mission to create a more caring and equitable society.
+          Whether it's distributing food, supporting events, or spreading awareness, every small effort counts.
+        </p>
+      </div>
+
+      <!-- Registration Form -->
+      <form id="volunteerForm" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- Left Side -->
+        <div>
+          <label class="block mb-1 font-semibold">Full Name</label>
+          <input name="name" type="text" placeholder="Your full name" required class="w-full p-3 rounded bg-gray-800 border border-gray-600 focus:ring focus:ring-yellow-400"/>
+
+          <label class="block mt-4 mb-1 font-semibold">Phone Number</label>
+          <input name="phone" type="tel" placeholder="Your phone number" required class="w-full p-3 rounded bg-gray-800 border border-gray-600 focus:ring focus:ring-yellow-400"/>
+
+          <label class="block mt-4 mb-1 font-semibold">Email</label>
+          <input name="email" type="email" placeholder="Your email address" required class="w-full p-3 rounded bg-gray-800 border border-gray-600 focus:ring focus:ring-yellow-400"/>
+
+          <label class="block mt-4 mb-1 font-semibold">Transportation</label>
+          <select name="transport" class="w-full p-3 rounded bg-gray-800 border border-gray-600 focus:ring focus:ring-yellow-400">
+            <option>Own Vehicle</option>
+            <option>Public Transport</option>
+            <option>Walking</option>
+          </select>
+        </div>
+
+        <!-- Right Side -->
+        <div>
+          <label class="block mb-1 font-semibold">Preferred Areas</label>
+          <input name="areas" type="text" placeholder="Areas you can volunteer in" class="w-full p-3 rounded bg-gray-800 border border-gray-600 focus:ring focus:ring-yellow-400"/>
+
+          <label class="block mt-4 font-semibold">Available Days</label>
+          <div class="grid grid-cols-2 gap-2 mt-2">
+            <label><input name="days" type="checkbox" value="Monday" class="mr-2">Monday</label>
+            <label><input name="days" type="checkbox" value="Tuesday" class="mr-2">Tuesday</label>
+            <label><input name="days" type="checkbox" value="Wednesday" class="mr-2">Wednesday</label>
+            <label><input name="days" type="checkbox" value="Thursday" class="mr-2">Thursday</label>
+            <label><input name="days" type="checkbox" value="Friday" class="mr-2">Friday</label>
+            <label><input name="days" type="checkbox" value="Saturday" class="mr-2">Saturday</label>
+            <label><input name="days" type="checkbox" value="Sunday" class="mr-2">Sunday</label>
+            <label><input name="days" type="checkbox" value="Every Day" class="mr-2">Every Day</label>
+          </div>
+
+          <label class="block mt-4 mb-1 font-semibold">Preferred Time Slots</label>
+          <select name="times" multiple class="w-full p-3 rounded bg-gray-800 border border-gray-600 focus:ring focus:ring-yellow-400 h-24">
+            <option>Morning (6 AM - 12 PM)</option>
+            <option>Afternoon (12 PM - 6 PM)</option>
+            <option>Evening (6 PM - 10 PM)</option>
+          </select>
+        </div>
+
+        <!-- Submit Button -->
+        <div class="text-center mt-6 col-span-2">
+          <button type="submit" class="bg-yellow-500 hover:bg-yellow-600 text-black px-6 py-3 rounded-lg font-semibold">
+            Submit Registration
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Script -->
+  <script>
+    document.getElementById('volunteerForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+
+      // Collect form data
+      const formData = new FormData(e.target);
+      const data = Object.fromEntries(formData.entries());
+      data.days = formData.getAll('days'); // collect all checked days
+
+      console.log("Volunteer Data:", data);
+
+      // Simulate saving (replace with real API call later)
+      alert("✅ Volunteer registration submitted successfully!");
+      
+      // Example: redirect to NGO dashboard
+      // window.location.href = `/ngo-dashboard.html?email=${encodeURIComponent(data.email)}`;
+    });
+  </script>
+</body>
+</html>
