@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DonateEasy - Edit Profile</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen">
+
+  <nav class="bg-gray-900 text-white flex justify-between items-center px-8 py-5 shadow">
+    <div class="flex items-center gap-2">
+      <img src="../assets/logo1.jpg" alt="Logo" class="w-10 h-10">
+      <span class="text-2xl font-bold text-yellow-400">DonateEasy</span>
+    </div>
+    <a href="../index.html" class="hover:text-yellow-400">Home</a>
+  </nav>
+
+  <main class="max-w-xl mx-auto mt-10 bg-white rounded-lg shadow p-6">
+    <h1 class="text-xl font-semibold mb-4">Edit Profile</h1>
+    <form id="profileForm" class="space-y-4">
+      <div>
+        <label class="block text-sm font-medium text-gray-700">Full Name</label>
+        <input id="fullName" type="text" class="w-full border rounded px-3 py-2" required />
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-gray-700">Email</label>
+        <input id="email" type="email" class="w-full border rounded px-3 py-2 bg-gray-100" disabled />
+      </div>
+      <div class="flex gap-3">
+        <button type="submit" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">Save</button>
+        <a href="ngo_dashboard.html" class="px-4 py-2 rounded border">Cancel</a>
+      </div>
+    </form>
+  </main>
+
+  <script>
+    (function init(){
+      const userRaw = localStorage.getItem('de_authUser');
+      const token = localStorage.getItem('access_token');
+      if (!token) { window.location.replace('login.html'); return; }
+      let user = { email: '', fullName: '' };
+      try { if (userRaw) user = JSON.parse(userRaw); } catch(_) {}
+      document.getElementById('email').value = user.email || '';
+      document.getElementById('fullName').value = user.fullName || '';
+
+      document.getElementById('profileForm').addEventListener('submit', async function(e){
+        e.preventDefault();
+        const name = document.getElementById('fullName').value.trim();
+        if (!name) { alert('Please enter full name'); return; }
+        try {
+          const res = await fetch('http://localhost:4000/api/auth/profile', {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': 'Bearer ' + token
+            },
+            body: JSON.stringify({ name })
+          });
+          const data = await res.json();
+          if (!res.ok) { alert(data.error || 'Failed to update'); return; }
+          try {
+            const updated = { email: user.email, fullName: name, role: user.role || 'user' };
+            localStorage.setItem('de_authUser', JSON.stringify(updated));
+          } catch(_) {}
+          alert('Profile updated');
+          window.location.replace('ngo_dashboard.html');
+        } catch(_) {
+          alert('Network error');
+        }
+      });
+    })();
+  </script>
+
+</body>
+</html>
+
+
+

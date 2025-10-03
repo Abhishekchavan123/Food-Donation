@@ -368,8 +368,9 @@
     }
 
     document.getElementById('signoutBtn').addEventListener('click', () => {
-      localStorage.removeItem('de_authUser');
-      location.reload();
+      try { localStorage.removeItem('access_token'); } catch(_) {}
+      try { localStorage.removeItem('de_authUser'); } catch(_) {}
+      window.location.replace('login.html');
     });
 
     // NGO Pickup List Example Data

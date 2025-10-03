@@ -1,32 +1,26 @@
-const express = require("express");
-const dotenv = require("dotenv");
-const cors = require("cors");
-const connectDB = require("./config/db");
-const errorHandler = require("./middleware/errorMiddleware");
-
-// Load env vars
-dotenv.config();
-
-// Connect Database
-connectDB();
+require('dotenv').config();
+const express = require('express');
+const cors = require('cors');
 
 const app = express();
 
-// Middleware
+app.use(cors({ origin: '*', methods: ['GET','POST','PUT','DELETE','OPTIONS'], allowedHeaders: ['Content-Type','Authorization'] }));
 app.use(express.json());
-app.use(cors());
 
-// Routes
-app.use("/api/auth", require("./routes/authRoutes"));
-app.use("/api/donations", require("./routes/donationRoutes"));
-app.use("/api/ngos", require("./routes/ngoRoutes"));
-app.use("/api/admin", require("./routes/adminRoutes"));
-
-// Error Handler Middleware (must be last)
-app.use(errorHandler);
-
-// Start server
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log(`🚀 Server running on port ${PORT}`);
+app.get('/health', (req, res) => {
+  res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
+
+// Auth routes
+app.use('/api/auth', require('./src/routes/auth'));
+// NGO routes
+app.use('/api/ngos', require('./src/routes/ngo'));
+// Donations routes
+app.use('/api/donations', require('./src/routes/donations'));
+
+const PORT = process.env.PORT || 4000;
+app.listen(PORT, () => {
+  console.log(`API listening on port ${PORT}`);
+});
+
+

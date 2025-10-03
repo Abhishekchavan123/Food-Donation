@@ -62,30 +62,43 @@
         }
     </style>
 </head>
-<b class="bg-gray-900 text-white">
+<body class="bg-gray-900 text-white">
 
     <!-- Slideshow Background -->
     <div class="slideshow">
         <div class="slide"></div>
         <div class="slide"></div>
         <div class="slide"></div>
-        <div class="overlay"></div>
+        <div class="overlay pointer-events-none"></div>
 
         <!-- Navbar -->
-        <nav class="relative z-10 flex justify-between items-center px-8 py-5">
+        <nav class="relative z-50 pointer-events-auto flex justify-between items-center px-8 py-5">
             <div class="flex items-center space-x-2">
-                <img src="../frontend/assets/logo1.jpg" alt="Logo" class="w-10 h-10 animate-bounce">
+                <img src="https://qsyyshbhsoqfaxoqdqwp.supabase.co/storage/v1/object/sign/assets/logo1.jpg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV83NmNiMWMxMC1iZmFiLTQ0NzgtOWY4My00NmIyMDgxZWIyZmMiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJhc3NldHMvbG9nbzEuanBnIiwiaWF0IjoxNzU5Mjg3MTQwLCJleHAiOjE3OTA4MjMxNDB9.gS6qMW_rieUwiP0yFWKsFhr8J9tyYk5pkoydRr5_d6I" alt="Logo" class="w-10 h-10 animate-bounce">
                 <span class="text-3xl font-bold text-yellow-400 drop-shadow-lg">DonateEasy</span>
 
             </div>
-            <div class="space-x-8 text-lg">
+            <div class="space-x-8 text-lg flex items-center">
                 <a href="#" class="hover:text-yellow-400 transition">Home</a>
                 <a href="join-ngo.html" class="hover:text-yellow-400 transition">Join as NGO</a>
                 <a href="#about" class="hover:text-yellow-400 transition">About Us</a>
                 <a href="#contact" class="hover:text-yellow-400 transition">Contact Us</a>
-                <a href="auth/login.html" class="hover:text-yellow-400 transition">Login / Register</a>
-                
-
+                <span id="authLoginLink" class="inline-block">
+                  <a href="auth/login.html" class="hover:text-yellow-400 transition">Login / Register</a>
+                </span>
+                <div id="profileMenuRoot" class="relative z-50 hidden">
+                  <button id="profileBtn" type="button" class="flex items-center gap-2 px-3 py-1.5 bg-white/10 hover:bg-white/20 rounded-md text-sm cursor-pointer">
+                    <span id="profileAvatar" class="inline-block w-7 h-7 rounded-full bg-yellow-400 text-black font-bold grid place-items-center">U</span>
+                    <span id="profileName" class="hidden md:inline">User</span>
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                  </button>
+                  <div id="profileDropdown" class="absolute right-0 mt-2 w-44 bg-white text-gray-800 rounded-md shadow-lg hidden z-50 pointer-events-auto">
+                    <a href="auth/ngo_dashboard.html" class="block px-4 py-2 hover:bg-gray-100 text-sm cursor-pointer">Dashboard</a>
+                    <a href="auth/profile.html" id="editProfileLink" class="block px-4 py-2 hover:bg-gray-100 text-sm cursor-pointer">Edit Profile</a>
+                    <div class="border-t my-1"></div>
+                    <button id="logoutBtn" type="button" class="w-full text-left block px-4 py-2 hover:bg-gray-100 text-sm text-red-600 cursor-pointer">Logout</button>
+                  </div>
+                </div>
             </div>
         </nav>
 
@@ -325,6 +338,72 @@
   </div>
 </footer>
 
+
+<script>
+  (function setupNavProfile(){
+    const loginSpan = document.getElementById('authLoginLink');
+    const root = document.getElementById('profileMenuRoot');
+    const btn = document.getElementById('profileBtn');
+    const menu = document.getElementById('profileDropdown');
+    const avatar = document.getElementById('profileAvatar');
+    const nameEl = document.getElementById('profileName');
+    const logoutBtn = document.getElementById('logoutBtn');
+    const editProfileLink = document.getElementById('editProfileLink');
+
+    if (!loginSpan || !root) return;
+    const token = localStorage.getItem('access_token');
+    if (token) {
+      let displayName = 'User';
+      try {
+        const raw = localStorage.getItem('de_authUser');
+        if (raw) {
+          const u = JSON.parse(raw);
+          displayName = (u.fullName || u.email || 'User');
+        }
+      } catch(_) {}
+      if (avatar) avatar.textContent = displayName.charAt(0).toUpperCase();
+      if (nameEl) nameEl.textContent = displayName;
+      loginSpan.classList.add('hidden');
+      root.classList.remove('hidden');
+    } else {
+      root.classList.add('hidden');
+      loginSpan.classList.remove('hidden');
+      return;
+    }
+
+    function positionMenu() {
+      if (!btn || !menu) return;
+      // Temporarily show to measure
+      const wasHidden = menu.classList.contains('hidden');
+      if (wasHidden) { menu.classList.remove('hidden'); menu.style.visibility = 'hidden'; }
+      const rect = btn.getBoundingClientRect();
+      menu.style.position = 'fixed';
+      menu.style.top = (rect.bottom + 6) + 'px';
+      // Align right edges
+      const menuWidth = menu.offsetWidth || 176; // ~w-44
+      menu.style.left = Math.max(8, rect.right - menuWidth) + 'px';
+      menu.style.zIndex = 9999;
+      if (wasHidden) { menu.classList.add('hidden'); menu.style.visibility = ''; }
+    }
+    function openMenu(){ positionMenu(); menu.classList.remove('hidden'); }
+    function closeMenu(){ menu.classList.add('hidden'); }
+    function toggleMenu(){ if (menu.classList.contains('hidden')) openMenu(); else closeMenu(); }
+    if (btn) btn.addEventListener('click', (e)=>{ e.stopPropagation(); toggleMenu(); });
+    if (menu) menu.addEventListener('click', (e)=>{ e.stopPropagation(); });
+    document.addEventListener('click', (e)=>{ if (!root.contains(e.target)) closeMenu(); });
+    if (logoutBtn) logoutBtn.addEventListener('click', ()=>{
+      try { localStorage.removeItem('access_token'); } catch(_) {}
+      try { localStorage.removeItem('de_authUser'); } catch(_) {}
+      closeMenu();
+      window.location.replace('auth/login.html');
+    });
+    if (editProfileLink) editProfileLink.addEventListener('click', (e)=>{
+      e.preventDefault();
+      closeMenu();
+      window.location.href = 'auth/profile.html';
+    });
+  })();
+  </script>
 
 </body>
 </html>

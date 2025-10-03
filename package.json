@@ -1,0 +1,36 @@
+{
+  "dependencies": {
+    "@supabase/supabase-js": "^2.47.10",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.2"
+  },
+  "name": "fooddonation-",
+  "version": "1.0.0",
+  "main": "backend/server.js",
+  "devDependencies": {
+    "concurrently": "^9.2.1",
+    "live-server": "^1.2.2",
+    "nodemon": "^3.1.7"
+  },
+  "scripts": {
+    "dev": "nodemon backend/server.js",
+    "front:dev": "live-server --no-browser --port=5173 ./frontend",
+    "back:dev": "nodemon backend/server.js",
+    "dev:full": "concurrently \"npm:back:dev\" \"npm:front:dev\"",
+    "start": "node backend/server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kumarRavi07/FoodDonation-.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/kumarRavi07/FoodDonation-/issues"
+  },
+  "homepage": "https://github.com/kumarRavi07/FoodDonation-#readme",
+  "description": ""
+}

@@ -112,21 +112,54 @@
   </div>
 
   <script>
-    document.getElementById('loginForm').addEventListener('submit', function(e) {
+    document.getElementById('loginForm').addEventListener('submit', async function(e) {
       e.preventDefault();
-
-      const correctEmail = "donor@example.com";
-      const correctPassword = "123456";
 
       const email = document.getElementById('email').value.trim();
       const password = document.getElementById('password').value.trim();
       const errorMsg = document.getElementById('errorMsg');
 
-      if (email === correctEmail && password === correctPassword) {
-        errorMsg.classList.add('hidden');
-        alert('Login Successful! Redirecting to Home...');
-        window.location.href = "index.html";
-      } else {
+      errorMsg.classList.add('hidden');
+
+      if (!email || !password) {
+        errorMsg.textContent = 'Please enter email and password.';
+        errorMsg.classList.remove('hidden');
+        return;
+      }
+
+      try {
+        const res = await fetch('http://localhost:4000/api/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password })
+        });
+        const data = await res.json();
+
+        if (!res.ok) {
+          errorMsg.textContent = data.error || 'Invalid email or password.';
+          errorMsg.classList.remove('hidden');
+          return;
+        }
+
+        // Store session token and basic user info for navbar/profile usage
+        if (data.session && data.session.access_token) {
+          localStorage.setItem('access_token', data.session.access_token);
+        }
+        try {
+          const meta = data.user && data.user.user_metadata ? data.user.user_metadata : {};
+          const fullName = meta.full_name || meta.name || '';
+          const userObj = {
+            email: (data.user && data.user.email) || email,
+            fullName: fullName || (email && email.split('@')[0]) || 'User',
+            role: 'user'
+          };
+          localStorage.setItem('de_authUser', JSON.stringify(userObj));
+        } catch (_) {}
+
+        alert('Login successful! Redirecting...');
+        window.location.href = '../index.html';
+      } catch (err) {
+        errorMsg.textContent = 'Network error. Please try again.';
         errorMsg.classList.remove('hidden');
       }
     });

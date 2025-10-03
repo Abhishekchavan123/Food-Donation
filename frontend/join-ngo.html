@@ -91,21 +91,35 @@
 
   <!-- Script -->
   <script>
-    document.getElementById('volunteerForm').addEventListener('submit', function(e) {
+    document.getElementById('volunteerForm').addEventListener('submit', async function(e) {
       e.preventDefault();
 
-      // Collect form data
       const formData = new FormData(e.target);
       const data = Object.fromEntries(formData.entries());
-      data.days = formData.getAll('days'); // collect all checked days
+      data.days = formData.getAll('days');
+      // For multi-select times, ensure array
+      if (data.times && typeof data.times === 'string') {
+        // when multiple selected, FormData returns last; collect all options instead
+        const timesSel = e.target.querySelector('select[name="times"]');
+        data.times = Array.from(timesSel.selectedOptions).map(o => o.value);
+      }
 
-      console.log("Volunteer Data:", data);
-
-      // Simulate saving (replace with real API call later)
-      alert("✅ Volunteer registration submitted successfully!");
-      
-      // Example: redirect to NGO dashboard
-      // window.location.href = `/ngo-dashboard.html?email=${encodeURIComponent(data.email)}`;
+      try {
+        const res = await fetch('http://localhost:4000/api/ngos/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+        const out = await res.json();
+        if (!res.ok) {
+          alert(out.error || 'Submission failed');
+          return;
+        }
+        alert('✅ Volunteer registration submitted successfully!');
+        e.target.reset();
+      } catch (err) {
+        alert('Network error, please try again.');
+      }
     });
   </script>
 </body>
