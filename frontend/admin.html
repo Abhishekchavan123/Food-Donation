@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Dashboard - Food Donation</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f9fafb;
+      margin: 0;
+      padding: 0;
+    }
+    header {
+      background: #1e293b;
+      color: #fff;
+      text-align: center;
+      padding: 1rem;
+      font-size: 1.5rem;
+    }
+    nav {
+      background: #334155;
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      padding: 0.75rem;
+    }
+    nav button {
+      background: #475569;
+      color: white;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    nav button.active {
+      background: #10b981;
+    }
+    main {
+      padding: 1rem 2rem;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1rem;
+      background: #fff;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    }
+    th, td {
+      padding: 0.75rem;
+      border-bottom: 1px solid #e5e7eb;
+      text-align: left;
+    }
+    th {
+      background: #f1f5f9;
+      color: #1e293b;
+      font-weight: bold;
+    }
+    tr:hover {
+      background: #f9fafb;
+    }
+  </style>
+</head>
+<body>
+
+  <header>🛠️ Admin Dashboard</header>
+
+  <nav>
+    <button class="tab-btn active" data-tab="contacts">Contacts</button>
+    <button class="tab-btn" data-tab="donations">Donations</button>
+    <button class="tab-btn" data-tab="ngos">NGOs</button>
+  </nav>
+
+  <main id="content">
+    <h2>Loading data...</h2>
+  </main>
+
+  <script>
+    const content = document.getElementById("content");
+    const buttons = document.querySelectorAll(".tab-btn");
+
+    buttons.forEach(btn => {
+      btn.addEventListener("click", () => {
+        buttons.forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        loadTab(btn.dataset.tab);
+      });
+    });
+
+    async function loadTab(tab) {
+      content.innerHTML = `<h2>Loading ${tab}...</h2>`;
+      try {
+        let res, data;
+
+        if (tab === "contacts") {
+          res = await fetch("http://localhost:4000/api/contact");
+          data = await res.json();
+          renderContacts(data.contacts || []);
+        } 
+        else if (tab === "donations") {
+          res = await fetch("http://localhost:4000/api/donations");
+          data = await res.json();
+          renderDonations(data.donations || []);
+        } 
+        else if (tab === "ngos") {
+          res = await fetch("http://localhost:4000/api/ngos/register");
+          data = await res.json();
+          renderNGOs(data.ngos || []);
+        }
+
+      } catch (err) {
+        content.innerHTML = `<p style="color:red;">Error: ${err.message}</p>`;
+      }
+    }
+
+    function renderContacts(contacts) {
+      if (!contacts.length) {
+        content.innerHTML = "<p>No contact messages found.</p>";
+        return;
+      }
+
+      const rows = contacts.map(c => `
+        <tr>
+          <td>${c.name}</td>
+          <td>${c.email}</td>
+          <td>${c.message}</td>
+          <td>${new Date(c.created_at).toLocaleString()}</td>
+        </tr>
+      `).join("");
+
+      content.innerHTML = `
+        <h2>Contact Messages</h2>
+        <table>
+          <thead>
+            <tr><th>Name</th><th>Email</th><th>Message</th><th>Date</th></tr>
+          </thead>
+          <tbody>${rows}</tbody>
+        </table>
+      `;
+    }
+
+    function renderDonations(donations) {
+      if (!donations.length) {
+        content.innerHTML = "<p>No donations found.</p>";
+        return;
+      }
+
+      const rows = donations.map(d => `
+        <tr>
+          <td>${d.food_type}</td>
+          <td>${d.quantity}</td>
+          <td>${d.expiry_date}</td>
+          <td>${d.donor_name}</td>
+          <td>${d.phone_number}</td>
+          <td>${d.pickup_address}</td>
+          <td>${d.status}</td>
+        </tr>
+      `).join("");
+
+      content.innerHTML = `
+        <h2>Donations</h2>
+        <table>
+          <thead>
+            <tr><th>Food Type</th><th>Qty</th><th>Expiry</th><th>Donor</th><th>Phone</th><th>Pickup</th><th>Status</th></tr>
+          </thead>
+          <tbody>${rows}</tbody>
+        </table>
+      `;
+    }
+
+    function renderNGOs(ngos) {
+      if (!ngos.length) {
+        content.innerHTML = "<p>No NGOs found.</p>";
+        return;
+      }
+
+      const rows = ngos.map(n => `
+        <tr>
+          <td>${n.name}</td>
+          <td>${n.email}</td>
+          <td>${n.phone}</td>
+          <td>${n.address}</td>
+        </tr>
+      `).join("");
+
+      content.innerHTML = `
+        <h2>Registered NGOs</h2>
+        <table>
+          <thead>
+            <tr><th>Name</th><th>Email</th><th>Phone</th><th>Address</th></tr>
+          </thead>
+          <tbody>${rows}</tbody>
+        </table>
+      `;
+    }
+
+    // Load contacts first by default
+    loadTab("contacts");
+  </script>
+</body>
+</html>

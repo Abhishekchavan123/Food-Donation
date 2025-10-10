@@ -17,6 +17,8 @@ app.use('/api/auth', require('./src/routes/auth'));
 app.use('/api/ngos', require('./src/routes/ngo'));
 // Donations routes
 app.use('/api/donations', require('./src/routes/donations'));
+// Contact routes
+app.use('/api/contact', require('./src/routes/contact'));
 
 const PORT = process.env.PORT || 4000;
 app.listen(PORT, () => {
