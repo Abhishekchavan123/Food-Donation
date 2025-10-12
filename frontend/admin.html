@@ -1,204 +1,290 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Admin Dashboard - Food Donation</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f9fafb;
-      margin: 0;
-      padding: 0;
-    }
-    header {
-      background: #1e293b;
-      color: #fff;
-      text-align: center;
-      padding: 1rem;
-      font-size: 1.5rem;
-    }
-    nav {
-      background: #334155;
-      display: flex;
-      justify-content: center;
-      gap: 1rem;
-      padding: 0.75rem;
-    }
-    nav button {
-      background: #475569;
-      color: white;
-      border: none;
-      padding: 0.5rem 1rem;
-      border-radius: 6px;
-      cursor: pointer;
-      font-weight: bold;
-    }
-    nav button.active {
-      background: #10b981;
-    }
-    main {
-      padding: 1rem 2rem;
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 1rem;
-      background: #fff;
-      border-radius: 8px;
-      overflow: hidden;
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-    }
-    th, td {
-      padding: 0.75rem;
-      border-bottom: 1px solid #e5e7eb;
-      text-align: left;
-    }
-    th {
-      background: #f1f5f9;
-      color: #1e293b;
-      font-weight: bold;
-    }
-    tr:hover {
-      background: #f9fafb;
-    }
-  </style>
+  <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
 
-  <header>🛠️ Admin Dashboard</header>
+<body class="bg-gray-100 h-screen overflow-hidden font-sans">
 
-  <nav>
-    <button class="tab-btn active" data-tab="contacts">Contacts</button>
-    <button class="tab-btn" data-tab="donations">Donations</button>
-    <button class="tab-btn" data-tab="ngos">NGOs</button>
-  </nav>
+  <!-- Navbar -->
+  <header
+    class="fixed top-0 left-0 w-full h-14 bg-slate-800 text-white flex items-center justify-between px-4 shadow-md z-10">
+    <h1 class="text-lg font-semibold">🛠️ Admin Dashboard</h1>
+    <div class="flex items-center gap-3">
+      <button id="drawerToggle" class="bg-emerald-500 hover:bg-emerald-600 px-3 py-1 rounded text-sm">☰ Menu</button>
+      <button class="bg-emerald-500 hover:bg-emerald-600 px-3 py-1 rounded text-sm">🏠 Home</button>
+      <button class="bg-emerald-500 hover:bg-emerald-600 px-3 py-1 rounded text-sm">👤 User</button>
+      <span id="authLoginLink" class="inline-block">
+        <a href="auth/login.html" class="hover:text-yellow-400 transition">Login / Register</a>
+      </span>
+      <div id="profileMenuRoot" class="relative z-50 hidden">
+        <button id="profileBtn" type="button"
+          class="flex items-center gap-2 px-3 py-1.5 bg-white/10 hover:bg-white/20 rounded-md text-sm cursor-pointer">
+          <span id="profileAvatar"
+            class="inline-block w-7 h-7 rounded-full bg-yellow-400 text-black font-bold grid place-items-center">U</span>
+          <span id="profileName" class="hidden md:inline">User</span>
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+          </svg>
+        </button>
+        <div id="profileDropdown"
+          class="absolute right-0 mt-2 w-44 bg-white text-gray-800 rounded-md shadow-lg hidden z-50 pointer-events-auto">
+          <!-- <a href="auth/ngo_dashboard.html"
+            class="block px-4 py-2 hover:bg-gray-100 text-sm cursor-pointer">Dashboard</a> -->
+          <!-- <a href="auth/profile.html" id="editProfileLink"
+            class="block px-4 py-2 hover:bg-gray-100 text-sm cursor-pointer">Edit Profile</a> -->
+          <div class="border-t my-1"></div>
+          <button id="logoutBtn" type="button"
+            class="w-full text-left block px-4 py-2 hover:bg-gray-100 text-sm text-red-600 cursor-pointer">Logout</button>
+        </div>
+      </div>
+    </div>
+  </header>
 
-  <main id="content">
-    <h2>Loading data...</h2>
+  <!-- Drawer -->
+  <aside id="drawer"
+    class="fixed top-14 left-0 w-64 h-[calc(100%-3.5rem)] bg-slate-700 text-white transform transition-transform duration-300 ease-in-out translate-x-0 flex flex-col py-4 space-y-2">
+    <button class="tab-btn active text-left px-5 py-2 hover:bg-emerald-500 bg-emerald-500">Contacts</button>
+    <button class="tab-btn text-left px-5 py-2 hover:bg-emerald-500">Donations</button>
+    <button class="tab-btn text-left px-5 py-2 hover:bg-emerald-500">NGOs</button>
+  </aside>
+
+  <!-- Main Content -->
+  <main id="content" class="pt-16 pl-64 pr-4 pb-4 h-full overflow-y-auto transition-all duration-300 ease-in-out">
+    <h2 class="text-xl font-semibold text-slate-800">Loading data...</h2>
   </main>
 
   <script>
+    const drawer = document.getElementById("drawer");
+    const toggleBtn = document.getElementById("drawerToggle");
     const content = document.getElementById("content");
     const buttons = document.querySelectorAll(".tab-btn");
+    const main = document.querySelector("main");
 
+    // Drawer open/close toggle
+    toggleBtn.addEventListener("click", () => {
+      drawer.classList.toggle("-translate-x-full");
+      main.classList.toggle("pl-64");
+      main.classList.toggle("pl-0");
+    });
+
+    // Tab switching logic
     buttons.forEach(btn => {
       btn.addEventListener("click", () => {
-        buttons.forEach(b => b.classList.remove("active"));
-        btn.classList.add("active");
-        loadTab(btn.dataset.tab);
+        buttons.forEach(b => b.classList.remove("bg-emerald-500"));
+        btn.classList.add("bg-emerald-500");
+        loadTab(btn.textContent.trim().toLowerCase());
       });
     });
 
     async function loadTab(tab) {
-      content.innerHTML = `<h2>Loading ${tab}...</h2>`;
+      content.innerHTML = `<h2 class="text-slate-700">Loading ${tab}...</h2>`;
       try {
         let res, data;
-
         if (tab === "contacts") {
           res = await fetch("http://localhost:4000/api/contact");
           data = await res.json();
           renderContacts(data.contacts || []);
-        } 
-        else if (tab === "donations") {
+        } else if (tab === "donations") {
           res = await fetch("http://localhost:4000/api/donations");
           data = await res.json();
           renderDonations(data.donations || []);
-        } 
-        else if (tab === "ngos") {
+        } else if (tab === "ngos") {
           res = await fetch("http://localhost:4000/api/ngos/register");
           data = await res.json();
           renderNGOs(data.ngos || []);
         }
-
       } catch (err) {
-        content.innerHTML = `<p style="color:red;">Error: ${err.message}</p>`;
+        content.innerHTML = `<p class='text-red-500'>Error: ${err.message}</p>`;
       }
     }
 
     function renderContacts(contacts) {
       if (!contacts.length) {
-        content.innerHTML = "<p>No contact messages found.</p>";
+        content.innerHTML = "<p class='text-slate-600'>No contact messages found.</p>";
         return;
       }
-
       const rows = contacts.map(c => `
-        <tr>
-          <td>${c.name}</td>
-          <td>${c.email}</td>
-          <td>${c.message}</td>
-          <td>${new Date(c.created_at).toLocaleString()}</td>
-        </tr>
-      `).join("");
-
+          <tr class="hover:bg-gray-50">
+            <td class="px-4 py-2">${c.name}</td>
+            <td class="px-4 py-2">${c.email}</td>
+            <td class="px-4 py-2">${c.message}</td>
+            <td class="px-4 py-2">${new Date(c.created_at).toLocaleString()}</td>
+          </tr>
+        `).join("");
       content.innerHTML = `
-        <h2>Contact Messages</h2>
-        <table>
-          <thead>
-            <tr><th>Name</th><th>Email</th><th>Message</th><th>Date</th></tr>
-          </thead>
-          <tbody>${rows}</tbody>
-        </table>
-      `;
+          <h2 class="text-xl font-semibold text-slate-800 mb-2">📩 Contact Messages</h2>
+          <div class="overflow-x-auto bg-white rounded shadow">
+            <table class="min-w-full border">
+              <thead class="bg-gray-100 border-b">
+                <tr>
+                  <th class="px-4 py-2 text-left">Name</th>
+                  <th class="px-4 py-2 text-left">Email</th>
+                  <th class="px-4 py-2 text-left">Message</th>
+                  <th class="px-4 py-2 text-left">Date</th>
+                </tr>
+              </thead>
+              <tbody>${rows}</tbody>
+            </table>
+          </div>`;
     }
 
     function renderDonations(donations) {
       if (!donations.length) {
-        content.innerHTML = "<p>No donations found.</p>";
+        content.innerHTML = "<p class='text-slate-600'>No donations found.</p>";
         return;
       }
-
       const rows = donations.map(d => `
-        <tr>
-          <td>${d.food_type}</td>
-          <td>${d.quantity}</td>
-          <td>${d.expiry_date}</td>
-          <td>${d.donor_name}</td>
-          <td>${d.phone_number}</td>
-          <td>${d.pickup_address}</td>
-          <td>${d.status}</td>
-        </tr>
-      `).join("");
-
+          <tr class="hover:bg-gray-50">
+            <td class="px-4 py-2">${d.food_type}</td>
+            <td class="px-4 py-2">${d.quantity}</td>
+            <td class="px-4 py-2">${d.expiry_date}</td>
+            <td class="px-4 py-2">${d.donor_name}</td>
+            <td class="px-4 py-2">${d.phone_number}</td>
+            <td class="px-4 py-2">${d.pickup_address}</td>
+            <td class="px-4 py-2">${d.status}</td>
+          </tr>`).join("");
       content.innerHTML = `
-        <h2>Donations</h2>
-        <table>
-          <thead>
-            <tr><th>Food Type</th><th>Qty</th><th>Expiry</th><th>Donor</th><th>Phone</th><th>Pickup</th><th>Status</th></tr>
-          </thead>
-          <tbody>${rows}</tbody>
-        </table>
-      `;
+          <h2 class="text-xl font-semibold text-slate-800 mb-2">🎁 Donations</h2>
+          <div class="overflow-x-auto bg-white rounded shadow">
+            <table class="min-w-full border">
+              <thead class="bg-gray-100 border-b">
+                <tr>
+                  <th class="px-4 py-2 text-left">Food Type</th>
+                  <th class="px-4 py-2 text-left">Qty</th>
+                  <th class="px-4 py-2 text-left">Expiry</th>
+                  <th class="px-4 py-2 text-left">Donor</th>
+                  <th class="px-4 py-2 text-left">Phone</th>
+                  <th class="px-4 py-2 text-left">Pickup</th>
+                  <th class="px-4 py-2 text-left">Status</th>
+                </tr>
+              </thead>
+              <tbody>${rows}</tbody>
+            </table>
+          </div>`;
     }
 
+    // ✅ Your NGO mapping exactly as you wanted
     function renderNGOs(ngos) {
       if (!ngos.length) {
-        content.innerHTML = "<p>No NGOs found.</p>";
+        content.innerHTML = "<p class='text-slate-600'>No NGOs found.</p>";
         return;
       }
 
       const rows = ngos.map(n => `
-        <tr>
-          <td>${n.name}</td>
-          <td>${n.email}</td>
-          <td>${n.phone}</td>
-          <td>${n.address}</td>
-        </tr>
-      `).join("");
+    <tr class="border-b border-gray-200 hover:bg-emerald-50 transition">
+      <td class="px-4 py-3 font-medium text-gray-800">${n.name}</td>
+      <td class="px-4 py-3 text-gray-700">${n.email}</td>
+      <td class="px-4 py-3 text-gray-700">${n.phone}</td>
+      <td class="px-4 py-3 text-gray-600">${n.transport || '-'}</td>
+      <td class="px-4 py-3 text-gray-600">${n.areas || '-'}</td>
+      <td class="px-4 py-3 text-gray-600">${n.days || '-'}</td>
+      <td class="px-4 py-3 text-gray-600">${n.times || '-'}</td>
+      <td class="px-4 py-3 text-gray-500 text-sm">${new Date(n.created_at).toLocaleString()}</td>
+    </tr>
+  `).join("");
 
       content.innerHTML = `
-        <h2>Registered NGOs</h2>
-        <table>
-          <thead>
-            <tr><th>Name</th><th>Email</th><th>Phone</th><th>Address</th></tr>
-          </thead>
-          <tbody>${rows}</tbody>
-        </table>
-      `;
+    <div class="flex items-center justify-between mb-4">
+      <h2 class="text-2xl font-semibold text-slate-800">🏢 Registered NGOs</h2>
+      <span class="text-sm text-gray-600 bg-gray-200 px-3 py-1 rounded-full">${ngos.length} total</span>
+    </div>
+
+    <div class="overflow-x-auto bg-white rounded-xl shadow-md border border-gray-200">
+      <table class="min-w-full border-b">
+        <thead class="bg-gray-100 sticky top-0 z-10">
+          <tr class="text-left text-gray-900 uppercase text-sm">
+            <th class="px-4 py-3 font-semibold">Name</th>
+            <th class="px-4 py-3 font-semibold">Email</th>
+            <th class="px-4 py-3 font-semibold">Phone</th>
+            <th class="px-4 py-3 font-semibold">Transport</th>
+            <th class="px-4 py-3 font-semibold">Areas</th>
+            <th class="px-4 py-3 font-semibold">Days</th>
+            <th class="px-4 py-3 font-semibold">Times</th>
+            <th class="px-4 py-3 font-semibold">Registered On</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-100">
+          ${rows}
+        </tbody>
+      </table>
+    </div>
+  `;
     }
 
-    // Load contacts first by default
+
+    // Load first tab
     loadTab("contacts");
   </script>
+  <script>
+    (function setupNavProfile() {
+      const loginSpan = document.getElementById('authLoginLink');
+      const root = document.getElementById('profileMenuRoot');
+      const btn = document.getElementById('profileBtn');
+      const menu = document.getElementById('profileDropdown');
+      const avatar = document.getElementById('profileAvatar');
+      const nameEl = document.getElementById('profileName');
+      const logoutBtn = document.getElementById('logoutBtn');
+      const editProfileLink = document.getElementById('editProfileLink');
+
+      if (!loginSpan || !root) return;
+      const token = localStorage.getItem('access_token');
+      if (token) {
+        let displayName = 'User';
+        try {
+          const raw = localStorage.getItem('de_authUser');
+          if (raw) {
+            const u = JSON.parse(raw);
+            displayName = (u.fullName || u.email || 'User');
+          }
+        } catch (_) { }
+        if (avatar) avatar.textContent = displayName.charAt(0).toUpperCase();
+        if (nameEl) nameEl.textContent = displayName;
+        loginSpan.classList.add('hidden');
+        root.classList.remove('hidden');
+      } else {
+        root.classList.add('hidden');
+        loginSpan.classList.remove('hidden');
+        return;
+      }
+
+      function positionMenu() {
+        if (!btn || !menu) return;
+        // Temporarily show to measure
+        const wasHidden = menu.classList.contains('hidden');
+        if (wasHidden) { menu.classList.remove('hidden'); menu.style.visibility = 'hidden'; }
+        const rect = btn.getBoundingClientRect();
+        menu.style.position = 'fixed';
+        menu.style.top = (rect.bottom + 6) + 'px';
+        // Align right edges
+        const menuWidth = menu.offsetWidth || 176; // ~w-44
+        menu.style.left = Math.max(8, rect.right - menuWidth) + 'px';
+        menu.style.zIndex = 9999;
+        if (wasHidden) { menu.classList.add('hidden'); menu.style.visibility = ''; }
+      }
+      function openMenu() { positionMenu(); menu.classList.remove('hidden'); }
+      function closeMenu() { menu.classList.add('hidden'); }
+      function toggleMenu() { if (menu.classList.contains('hidden')) openMenu(); else closeMenu(); }
+      if (btn) btn.addEventListener('click', (e) => { e.stopPropagation(); toggleMenu(); });
+      if (menu) menu.addEventListener('click', (e) => { e.stopPropagation(); });
+      document.addEventListener('click', (e) => { if (!root.contains(e.target)) closeMenu(); });
+      if (logoutBtn) logoutBtn.addEventListener('click', () => {
+        try { localStorage.removeItem('access_token'); } catch (_) { }
+        try { localStorage.removeItem('de_authUser'); } catch (_) { }
+        closeMenu();
+        window.location.replace('auth/login.html');
+      });
+      if (editProfileLink) editProfileLink.addEventListener('click', (e) => {
+        e.preventDefault();
+        closeMenu();
+        window.location.href = 'auth/profile.html';
+      });
+    })();
+  </script>
 </body>
+
 </html>
