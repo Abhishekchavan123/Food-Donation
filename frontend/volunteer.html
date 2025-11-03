@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Volunteer Dashboard - DonateEasy</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .hero-bg {
+            background-image: url('https://images.unsplash.com/photo-1559027615-cd4628902d4a?auto=format&fit=crop&w=2070&q=80');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+        }
+
+        .action-btn {
+            transition: all 0.3s ease;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .status-item {
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .status-item:hover:not(.status-active):not(.status-disabled) {
+            transform: translateX(4px);
+        }
+
+        .status-item.status-active,
+        .status-item.status-disabled {
+            cursor: default;
+        }
+
+        .status-item.status-disabled {
+            opacity: 0.6;
+            pointer-events: none;
+        }
+
+        #statusSteps {
+            position: relative;
+            padding-left: 24px;
+        }
+
+        #statusSteps::before {
+            content: '';
+            position: absolute;
+            left: 0px;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background: #e5e7eb;
+            border-radius: 2px;
+            z-index: 0;
+        }
+
+        .status-progress-line {
+            position: absolute;
+            left: 0px;
+            top: 0;
+            width: 3px;
+            background: linear-gradient(180deg, #22c55e 0%, #16a34a 100%);
+            border-radius: 2px;
+            z-index: 1;
+            transition: height 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 0 8px rgba(34, 197, 94, 0.3);
+            height: 0;
+        }
+
+        .status-dot {
+            width: 14px;
+            height: 14px;
+            border: 3px solid #e5e7eb;
+            background: #f9fafb;
+            transition: all 0.3s ease;
+            left: -5.5px;
+        }
+
+        .status-item.status-active .status-dot,
+        .status-item.status-completed .status-dot {
+            border-color: #22c55e;
+            background: #22c55e;
+            box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.1);
+        }
+
+        .status-text {
+            font-size: 14px;
+            color: #6b7280;
+            transition: all 0.3s ease;
+        }
+
+        .status-item.status-active .status-text {
+            color: #3b82f6;
+            font-weight: 600;
+        }
+
+        .status-item.status-completed .status-text {
+            color: #8b5cf6;
+            font-weight: 500;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-100 min-h-screen">
+
+    <!-- Navbar -->
+    <nav class="bg-green-700 bg-opacity-90 text-white px-6 py-4 flex justify-between items-center shadow-lg">
+        <div class="flex items-center space-x-2">
+            <img src="https://qsyyshbhsoqfaxoqdqwp.supabase.co/storage/v1/object/sign/assets/logo1.jpg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV83NmNiMWMxMC1iZmFiLTQ0NzgtOWY4My00NmIyMDgxZWIyZmMiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJhc3NldHMvbG9nbzEuanBnIiwiaWF0IjoxNzU5Mjg3MTQwLCJleHAiOjE3OTA4MjMxNDB9.gS6qMW_rieUwiP0yFWKsFhr8J9tyYk5pkoydRr5_d6I"
+                alt="Logo" class="w-10 h-10 animate-bounce rounded-full">
+            <span class="text-2xl font-bold text-yellow-400">DonateEasy</span>
+        </div>
+        <div class="space-x-4 flex items-center">
+            <a href="index.html" class="hover:text-yellow-400 transition">Home</a>
+            <a href="donate.html" class="hover:text-yellow-400 transition">Donate</a>
+            <span id="authLoginLink" class="inline-block">
+                <a href="auth/login.html" class="hover:text-yellow-400 transition">Login</a>
+            </span>
+            <div id="profileMenuRoot" class="relative z-50 hidden">
+                <button id="profileBtn" type="button"
+                    class="flex items-center gap-2 px-3 py-1.5 bg-white/10 hover:bg-white/20 rounded-md text-sm cursor-pointer">
+                    <span id="profileAvatar"
+                        class="inline-block w-7 h-7 rounded-full bg-yellow-400 text-black font-bold grid place-items-center">U</span>
+                    <span id="profileName" class="hidden md:inline">User</span>
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                    </svg>
+                </button>
+                <div id="profileDropdown"
+                    class="absolute right-0 mt-2 w-44 bg-white text-gray-800 rounded-md shadow-lg hidden z-50 pointer-events-auto">
+                    <a href="auth/ngo_dashboard.html"
+                        class="block px-4 py-2 hover:bg-gray-100 text-sm cursor-pointer">Dashboard</a>
+                    <a href="auth/profile.html" id="editProfileLink"
+                        class="block px-4 py-2 hover:bg-gray-100 text-sm cursor-pointer">Edit Profile</a>
+                    <div class="border-t my-1"></div>
+                    <button id="logoutBtn" type="button"
+                        class="w-full text-left block px-4 py-2 hover:bg-gray-100 text-sm text-red-600 cursor-pointer">Logout</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Dashboard Layout -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="grid grid-cols-12 gap-6">
+            <!-- Sidebar -->
+            <aside class="col-span-12 md:col-span-3 lg:col-span-2 bg-white rounded-xl shadow-sm p-4 h-max sticky top-4">
+                <div class="flex items-center gap-3 mb-6">
+                    <div class="w-10 h-10 rounded-full bg-green-600 grid place-items-center text-white font-bold">D
+                    </div>
+                    <div>
+                        <p class="font-semibold leading-tight">DonateEasy</p>
+                        <p class="text-xs text-gray-500">Volunteer</p>
+                    </div>
+                </div>
+                <nav class="space-y-1" id="sidebarNav">
+                    <a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-green-50 text-gray-700" href="#"
+                        data-nav="dashboard">
+                        <span class="w-5 h-5 rounded-full bg-gray-200 grid place-items-center">🏠</span>
+                        <span>Dashboard</span>
+                    </a>
+                    <a class="flex items-center gap-3 px-3 py-2 rounded-lg bg-green-600 text-white" href="#"
+                        data-nav="active">
+                        <span class="w-5 h-5 grid place-items-center">🧭</span>
+                        <span>Active Donations</span>
+                    </a>
+                    <a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-green-50 text-gray-700" href="#"
+                        data-nav="history">📜 <span class="ml-2">History</span></a>
+                    <a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-green-50 text-gray-700" href="#"
+                        data-nav="leaderboard">🏆 <span class="ml-2">Leaderboard</span></a>
+                    <a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-green-50 text-gray-700" href="#"
+                        data-nav="profile">👤 <span class="ml-2">Profile</span></a>
+                    <a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-green-50 text-gray-700" href="#"
+                        data-nav="help">❓ <span class="ml-2">Help</span></a>
+                </nav>
+            </aside>
+
+            <!-- Main -->
+            <main class="col-span-12 md:col-span-9 lg:col-span-10">
+                <div class="flex items-center justify-between mb-4">
+                    <h1 class="text-2xl font-bold text-gray-800">Volunteer Dashboard</h1>
+                </div>
+
+                <div class="grid grid-cols-12 gap-6" id="dashboardTop">
+                    <!-- Active Donations -->
+                    <section class="col-span-12 lg:col-span-6" id="activeDonationsSection">
+                        <div class="bg-white rounded-xl shadow-sm p-4">
+                            <h2 class="text-lg font-semibold mb-3">Active Donations</h2>
+                            <div id="donationList" class="space-y-4">
+                                <!-- Populated by JS -->
+                            </div>
+                            <!-- Template for donation card to be cloned by JS -->
+                            <template id="donationCardTemplate">
+                                <div class="border rounded-lg p-4 hover:shadow-sm transition">
+                                    <div class="flex items-start justify-between">
+                                        <div>
+                                            <p class="font-semibold text-gray-800" data-name></p>
+                                            <p class="text-xs text-gray-500" data-address></p>
+                                        </div>
+                                        <span class="inline-flex items-center gap-1 text-sm text-gray-600" data-qtytype></span>
+                                    </div>
+                                    <div class="mt-3 flex items-center justify-between">
+                                        <span class="text-xs text-gray-500" data-time></span>
+                                        <div class="flex gap-2">
+                                            <button class="px-3 py-1.5 text-sm rounded-md bg-gray-100 hover:bg-gray-200" data-map>View on Map</button>
+                                            <button class="px-3 py-1.5 text-sm rounded-md" data-accept>Accept</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </template>
+                        </div>
+                    </section>
+
+                    <!-- Map + distance -->
+                    <section class="col-span-12 lg:col-span-6" id="mapSection">
+                        <div class="bg-white rounded-xl shadow-sm p-4">
+                            <div class="flex items-center justify-between mb-3">
+                                <h2 class="text-lg font-semibold">Route</h2>
+                                <div class="flex items-center gap-3 text-sm text-gray-600">
+                                    <span class="inline-flex items-center gap-1"><span>📍</span><span
+                                            id="distanceBadge">4 km</span></span>
+                                    <span class="inline-flex items-center gap-1"><span>⏱️</span><span id="etaBadge">9
+                                            min</span></span>
+                                </div>
+                            </div>
+                            <div
+                                class="w-full aspect-[4/3] rounded-lg bg-gray-100 grid place-items-center overflow-hidden">
+                                <img src="assets/bg4.jpg" alt="map" class="w-full h-full object-cover opacity-90">
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Completed Deliveries -->
+                    <section class="col-span-12 lg:col-span-8" id="completedSection">
+                        <div class="bg-white rounded-xl shadow-sm p-4">
+                            <h2 class="text-lg font-semibold mb-3">Completed Deliveries</h2>
+                            <div class="overflow-x-auto">
+                                <table class="min-w-full text-sm">
+                                    <thead>
+                                        <tr class="text-left text-gray-500">
+                                            <th class="py-2 pr-4">Date</th>
+                                            <th class="py-2 pr-4">Donor</th>
+                                            <th class="py-2 pr-4">Distance</th>
+                                            <th class="py-2 pr-4">Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="completedTable" class="divide-y">
+                                        <!-- rows by JS -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Task Status + Profile -->
+                    <aside class="col-span-12 lg:col-span-4 space-y-6">
+                        <div class="bg-white rounded-xl shadow-sm p-4">
+                            <h2 class="text-lg font-semibold mb-4">Task Status</h2>
+                            <ol class="relative" id="statusSteps">
+                                <div class="status-progress-line" id="progressLine" style="height: 0;"></div>
+                                <li class="mb-8 status-item relative z-10" data-step="accepted" data-position="0">
+                                    <div class="absolute status-dot rounded-full z-10" style="top: 0;"></div>
+                                    <div class="ml-8">
+                                        <p class="status-text mb-1">Accepted</p>
+                                        <p class="text-xs text-gray-400">Task has been accepted</p>
+                                    </div>
+                                </li>
+                                <li class="mb-8 status-item relative z-10" data-step="picked" data-position="1">
+                                    <div class="absolute status-dot rounded-full z-10" style="top: 0;"></div>
+                                    <div class="ml-8">
+                                        <p class="status-text mb-1">Picked Up</p>
+                                        <p class="text-xs text-gray-400">Item picked up from donor</p>
+                                    </div>
+                                </li>
+                                <li class="status-item relative z-10" data-step="delivered" data-position="2">
+                                    <div class="absolute status-dot rounded-full z-10" style="top: 0;"></div>
+                                    <div class="ml-8">
+                                        <p class="status-text mb-1">Delivered</p>
+                                        <p class="text-xs text-gray-400 mb-3">Successfully delivered to recipient</p>
+                                        <div class="flex items-center gap-2">
+                                            <button id="uploadBtn"
+                                                class="px-3 py-1.5 text-xs rounded-md bg-gray-800 hover:bg-gray-900 text-white transition">Upload
+                                                Photo</button>
+                                            <input id="uploadInput" type="file" accept="image/*" class="hidden">
+                                            <span id="uploadStatus" class="text-xs text-gray-500"></span>
+                                        </div>
+                                    </div>
+                                </li>
+                            </ol>
+                        </div>
+
+                        <div class="bg-white rounded-xl shadow-sm p-4" id="profileCard">
+                            <div class="flex items-center gap-3">
+                                <img id="profileAvatarCard" class="w-12 h-12 rounded-full bg-green-100" alt="avatar">
+                                <div>
+                                    <p id="profileNameCard" class="font-semibold">John Doe</p>
+                                    <p id="profileEmailCard" class="text-xs text-gray-500">john@example.com</p>
+                                </div>
+                            </div>
+                            <div class="mt-4 grid grid-cols-3 text-center">
+                                <div>
+                                    <div class="font-semibold" id="statPoints">990</div>
+                                    <div class="text-xs text-gray-500">Points</div>
+                                </div>
+                                <div>
+                                    <div class="font-semibold" id="statOrders">12</div>
+                                    <div class="text-xs text-gray-500">Deliveries</div>
+                                </div>
+                                <div>
+                                    <div class="font-semibold" id="statWeight">32kg</div>
+                                    <div class="text-xs text-gray-500">Donated</div>
+                                </div>
+                            </div>
+                            <div class="mt-4 text-sm text-gray-700 space-y-1">
+                                <p><span class="text-gray-500">Phone:</span> <span id="profilePhoneCard">—</span></p>
+                                <p><span class="text-gray-500">Transport:</span> <span
+                                        id="profileTransportCard">—</span></p>
+                                <p><span class="text-gray-500">Areas:</span> <span id="profileAreasCard">—</span></p>
+                                <p><span class="text-gray-500">Days:</span> <span id="profileDaysCard">—</span></p>
+                                <p><span class="text-gray-500">Times:</span> <span id="profileTimesCard">—</span></p>
+                            </div>
+                            <a href="auth/profile.html"
+                                class="mt-4 inline-flex items-center justify-center w-full px-3 py-2 rounded-md bg-gray-100 hover:bg-gray-200 text-sm">Edit
+                                Profile</a>
+                        </div>
+                    </aside>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-gray-400 py-8 mt-12">
+        <div class="max-w-6xl mx-auto px-6 text-center">
+            <p class="text-sm">© 2025 DonateEasy. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Profile menu setup
+        (function setupNavProfile() {
+            const loginSpan = document.getElementById('authLoginLink');
+            const root = document.getElementById('profileMenuRoot');
+            const btn = document.getElementById('profileBtn');
+            const menu = document.getElementById('profileDropdown');
+            const avatar = document.getElementById('profileAvatar');
+            const nameEl = document.getElementById('profileName');
+            const logoutBtn = document.getElementById('logoutBtn');
+            const editProfileLink = document.getElementById('editProfileLink');
+
+            if (!loginSpan || !root) return;
+            const token = localStorage.getItem('access_token');
+            if (token) {
+                let displayName = 'User';
+                try {
+                    const raw = localStorage.getItem('de_authUser');
+                    if (raw) {
+                        const u = JSON.parse(raw);
+                        displayName = (u.fullName || u.email || 'User');
+                    }
+                } catch (_) { }
+                if (avatar) avatar.textContent = displayName.charAt(0).toUpperCase();
+                if (nameEl) nameEl.textContent = displayName;
+                loginSpan.classList.add('hidden');
+                root.classList.remove('hidden');
+            } else {
+                root.classList.add('hidden');
+                loginSpan.classList.remove('hidden');
+                return;
+            }
+
+            function positionMenu() {
+                if (!btn || !menu) return;
+                const wasHidden = menu.classList.contains('hidden');
+                if (wasHidden) { menu.classList.remove('hidden'); menu.style.visibility = 'hidden'; }
+                const rect = btn.getBoundingClientRect();
+                menu.style.position = 'fixed';
+                menu.style.top = (rect.bottom + 6) + 'px';
+                const menuWidth = menu.offsetWidth || 176;
+                menu.style.left = Math.max(8, rect.right - menuWidth) + 'px';
+                menu.style.zIndex = 9999;
+                if (wasHidden) { menu.classList.add('hidden'); menu.style.visibility = ''; }
+            }
+            function openMenu() { positionMenu(); menu.classList.remove('hidden'); }
+            function closeMenu() { menu.classList.add('hidden'); }
+            function toggleMenu() { if (menu.classList.contains('hidden')) openMenu(); else closeMenu(); }
+            if (btn) btn.addEventListener('click', (e) => { e.stopPropagation(); toggleMenu(); });
+            if (menu) menu.addEventListener('click', (e) => { e.stopPropagation(); });
+            document.addEventListener('click', (e) => { if (!root.contains(e.target)) closeMenu(); });
+            if (logoutBtn) logoutBtn.addEventListener('click', () => {
+                try { localStorage.removeItem('access_token'); } catch (_) { }
+                try { localStorage.removeItem('de_authUser'); } catch (_) { }
+                closeMenu();
+                window.location.replace('auth/login.html');
+            });
+            if (editProfileLink) editProfileLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                closeMenu();
+                window.location.href = 'auth/profile.html';
+            });
+        })();
+
+        // Dashboard script
+        (function dashboard() {
+            const donationList = document.getElementById('donationList');
+            const completedTable = document.getElementById('completedTable');
+            const uploadBtn = document.getElementById('uploadBtn');
+            const uploadInput = document.getElementById('uploadInput');
+            const uploadStatus = document.getElementById('uploadStatus');
+            const statusSteps = document.getElementById('statusSteps');
+            const sidebarNav = document.getElementById('sidebarNav');
+            const dashboardTop = document.getElementById('dashboardTop');
+            const completedSection = document.getElementById('completedSection');
+
+            // Example active donations (can be replaced with API)
+            const donations = [
+                { id: 1, name: 'Harvest Restaurant', address: '123 Main St', qty: '20 kg', type: 'Fruits', time: 'Today 6:00 PM' },
+                { id: 2, name: 'Green Hotel', address: '789 Elm St', qty: '10 kg', type: 'Vegetables', time: 'Today 6:00 PM' }
+            ];
+
+            // Stack implementation: Track donation states (null -> 'accepted' -> 'picked' -> 'delivered')
+            const donationStates = new Map();
+
+            // Initialize states from localStorage (or reset on refresh)
+            function initDonationStates() {
+                // Reset states on each page refresh
+                donationStates.clear();
+                try {
+                    localStorage.removeItem('de_donation_states');
+                    localStorage.removeItem('de_volunteer_status');
+                } catch (_) { }
+            }
+
+            // Save states to localStorage
+            function saveDonationStates() {
+                const obj = Object.fromEntries(donationStates);
+                localStorage.setItem('de_donation_states', JSON.stringify(obj));
+            }
+
+            // Get button text and state based on current donation state
+            function getButtonConfig(donationId) {
+                const state = donationStates.get(donationId);
+                if (!state) {
+                    return { text: 'Accept Task', state: null, nextState: 'accepted' };
+                } else if (state === 'accepted') {
+                    return { text: 'Picked Up', state: 'accepted', nextState: 'picked' };
+                } else if (state === 'picked') {
+                    return { text: 'Delivered', state: 'picked', nextState: 'delivered' };
+                } else {
+                    return { text: 'Delivered', state: 'delivered', nextState: null };
+                }
+            }
+
+            // Update donation state (stack progression)
+            function updateDonationState(donationId) {
+                const config = getButtonConfig(donationId);
+                if (config.nextState) {
+                    donationStates.set(donationId, config.nextState);
+                    saveDonationStates();
+
+                    // Update progress line and status steps (allow progression from button clicks)
+                    setStep(config.nextState, true, true);
+
+                    // Re-render the donations to update button text
+                    renderDonations();
+                }
+            }
+
+            function renderDonations() {
+                // Use template cloning to create each donation card
+                const tpl = document.getElementById('donationCardTemplate');
+                if (!tpl) return;
+
+                // Clear existing children
+                while (donationList.firstChild) donationList.removeChild(donationList.firstChild);
+
+                donations.forEach(d => {
+                    const config = getButtonConfig(d.id);
+                    const isDelivered = config.state === 'delivered';
+
+                    const clone = tpl.content.cloneNode(true);
+                    const nameEl = clone.querySelector('[data-name]');
+                    const addrEl = clone.querySelector('[data-address]');
+                    const qtyType = clone.querySelector('[data-qtytype]');
+                    const timeEl = clone.querySelector('[data-time]');
+                    const viewBtn = clone.querySelector('[data-map]');
+                    const acceptBtn = clone.querySelector('[data-accept]');
+
+                    if (nameEl) nameEl.textContent = d.name;
+                    if (addrEl) addrEl.textContent = d.address;
+                    if (qtyType) qtyType.textContent = `${d.qty} • ${d.type}`;
+                    if (timeEl) timeEl.textContent = d.time;
+                    if (viewBtn) viewBtn.setAttribute('data-map', String(d.id));
+                    if (acceptBtn) {
+                        acceptBtn.textContent = config.text;
+                        acceptBtn.className = isDelivered ? 'px-3 py-1.5 text-sm rounded-md bg-gray-400 text-white cursor-not-allowed' : 'px-3 py-1.5 text-sm rounded-md bg-green-600 text-white hover:bg-green-700';
+                        if (isDelivered) acceptBtn.disabled = true;
+                        acceptBtn.setAttribute('data-accept', String(d.id));
+                    }
+
+                    donationList.appendChild(clone);
+                });
+            }
+
+            // Track which statuses have been clicked (disabled until refresh)
+            const clickedStatuses = new Set();
+
+            // Status messages
+            const statusMessages = {
+                'accepted': 'Accepted pending for pickup',
+                'picked': 'Picked up pending for delivery',
+                'delivered': 'Delivered successfully'
+            };
+
+            // Calculate progress line height based on step
+            function updateProgressLine(step) {
+                const progressLine = document.getElementById('progressLine');
+                const items = statusSteps.querySelectorAll('[data-step]');
+                const stepIndex = { 'accepted': 0, 'picked': 1, 'delivered': 2 };
+                const index = stepIndex[step] || 0;
+
+                if (items.length === 0 || !progressLine) return;
+
+                // Use setTimeout to ensure DOM is ready
+                setTimeout(() => {
+                    const firstItem = items[0];
+                    const targetItem = items[index];
+
+                    if (firstItem && targetItem) {
+                        const firstDot = firstItem.querySelector('.status-dot');
+                        const targetDot = targetItem.querySelector('.status-dot');
+
+                        if (firstDot && targetDot) {
+                            // Fill from top to center of target dot
+                            const targetCenter = targetItem.offsetTop + targetDot.offsetTop + (targetDot.offsetHeight / 2);
+
+                            progressLine.style.top = '0px';
+                            progressLine.style.height = Math.max(0, targetCenter) + 'px';
+                        }
+                    }
+                }, 50);
+            }
+
+            function setStep(step, showAlert = true, allowProgression = false) {
+                // If allowProgression is true (from button clicks), allow moving forward in sequence
+                if (!allowProgression) {
+                    // Check if already clicked (for direct status step clicks)
+                    if (clickedStatuses.has(step)) {
+                        return; // Don't allow re-clicking
+                    }
+                } else {
+                    // For button-based progression, allow moving forward
+                    const stepOrder = ['accepted', 'picked', 'delivered'];
+                    const currentIndex = stepOrder.indexOf(step);
+                    // Check if we're trying to move backwards
+                    const savedStep = localStorage.getItem('de_volunteer_status');
+                    if (savedStep) {
+                        const savedIndex = stepOrder.indexOf(savedStep);
+                        if (currentIndex < savedIndex) {
+                            return; // Don't allow going backwards
+                        }
+                    }
+                }
+
+                // Show alert message
+                if (showAlert && statusMessages[step]) {
+                    alert(statusMessages[step]);
+                }
+
+                // Mark as clicked
+                clickedStatuses.add(step);
+
+                // Mark previous steps as completed
+                const stepOrder = ['accepted', 'picked', 'delivered'];
+                const currentIndex = stepOrder.indexOf(step);
+
+                // Update visual state
+                statusSteps.querySelectorAll('[data-step]').forEach(li => {
+                    const stepValue = li.getAttribute('data-step');
+                    const stepIndex = stepOrder.indexOf(stepValue);
+
+                    li.classList.remove('status-active', 'status-completed');
+
+                    // Mark previous steps as completed
+                    if (stepIndex < currentIndex) {
+                        li.classList.add('status-completed');
+                        li.classList.remove('status-disabled');
+                    }
+
+                    // Disable current and clicked steps
+                    if (clickedStatuses.has(stepValue)) {
+                        li.classList.add('status-disabled');
+                    } else {
+                        li.classList.remove('status-disabled');
+                    }
+                });
+
+                const selectedLi = statusSteps.querySelector(`[data-step="${step}"]`);
+                if (selectedLi) {
+                    selectedLi.classList.add('status-active', 'status-disabled');
+                }
+
+                // Update progress line
+                updateProgressLine(step);
+
+                localStorage.setItem('de_volunteer_status', step);
+            }
+
+            function restoreStep() {
+                // Reset everything on page refresh - start with clean state
+                // Clear all status step visual states
+                statusSteps.querySelectorAll('[data-step]').forEach(li => {
+                    li.classList.remove('status-active', 'status-completed', 'status-disabled');
+                });
+
+                // Reset progress line to empty
+                const progressLine = document.getElementById('progressLine');
+                if (progressLine) {
+                    progressLine.style.height = '0';
+                }
+
+                // Clear clicked statuses
+                clickedStatuses.clear();
+            }
+
+            function wireEvents() {
+                donationList.addEventListener('click', (e) => {
+                    const acceptId = e.target.getAttribute('data-accept');
+                    if (acceptId) {
+                        updateDonationState(parseInt(acceptId));
+                    }
+                });
+                statusSteps.addEventListener('click', (e) => {
+                    // Don't trigger if clicking on upload button or input
+                    if (e.target.id === 'uploadBtn' || e.target.id === 'uploadInput') return;
+
+                    const li = e.target.closest('[data-step]');
+                    if (li && !li.classList.contains('status-disabled')) {
+                        const step = li.getAttribute('data-step');
+                        if (step === 'accepted') setStep('accepted');
+                        else if (step === 'picked') setStep('picked');
+                        else if (step === 'delivered') setStep('delivered');
+                    }
+                });
+                uploadBtn.addEventListener('click', () => uploadInput.click());
+                uploadInput.addEventListener('change', () => {
+                    const file = uploadInput.files && uploadInput.files[0];
+                    if (!file) return;
+                    uploadStatus.textContent = 'Uploading...';
+                    // Simulate upload
+                    setTimeout(() => {
+                        uploadStatus.textContent = 'Uploaded: ' + file.name;
+                    }, 700);
+                });
+
+                // Sidebar navigation handlers
+                sidebarNav.addEventListener('click', (e) => {
+                    const link = e.target.closest('a[data-nav]');
+                    if (!link) return;
+                    e.preventDefault();
+                    const key = link.getAttribute('data-nav');
+                    if (key === 'dashboard' || key === 'active') {
+                        dashboardTop.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    } else if (key === 'history') {
+                        completedSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    } else if (key === 'profile') {
+                        window.location.href = 'auth/profile.html';
+                    } else if (key === 'leaderboard') {
+                        alert('Leaderboard coming soon');
+                    } else if (key === 'help') {
+                        alert('For help, contact support@donateeasy.local');
+                    }
+                });
+            }
+
+            function renderCompleted() {
+                const rows = [
+                    { date: '2024-09-01', donor: 'Euwar', distance: '3.2 km', status: 'Delivered' },
+                    { date: '2024-08-28', donor: 'Delwian', distance: '1.8 km', status: 'Delivered' }
+                ];
+
+                // Clear existing rows
+                while (completedTable.firstChild) completedTable.removeChild(completedTable.firstChild);
+
+                rows.forEach(r => {
+                    const tr = document.createElement('tr');
+                    tr.className = 'text-gray-700';
+
+                    const tdDate = document.createElement('td'); tdDate.className = 'py-2 pr-4'; tdDate.textContent = r.date;
+                    const tdDonor = document.createElement('td'); tdDonor.className = 'py-2 pr-4'; tdDonor.textContent = r.donor;
+                    const tdDistance = document.createElement('td'); tdDistance.className = 'py-2 pr-4'; tdDistance.textContent = r.distance;
+                    const tdStatus = document.createElement('td'); tdStatus.className = 'py-2 pr-4 text-green-600'; tdStatus.textContent = r.status;
+
+                    tr.appendChild(tdDate);
+                    tr.appendChild(tdDonor);
+                    tr.appendChild(tdDistance);
+                    tr.appendChild(tdStatus);
+
+                    completedTable.appendChild(tr);
+                });
+            }
+
+            function hydrateProfile() {
+                try {
+                    const rawAuth = localStorage.getItem('de_authUser');
+                    const authUser = rawAuth ? JSON.parse(rawAuth) : null;
+                    const rawVolunteer = localStorage.getItem('de_volunteer_profile');
+                    const vol = rawVolunteer ? JSON.parse(rawVolunteer) : null;
+
+                    const displayName = (vol && vol.name) || (authUser && (authUser.fullName || authUser.email)) || 'John Doe';
+                    const displayEmail = (vol && vol.email) || (authUser && authUser.email) || '';
+                    document.getElementById('profileNameCard').textContent = displayName;
+                    document.getElementById('profileEmailCard').textContent = displayEmail;
+                    const avatar = document.getElementById('profileAvatarCard');
+                    avatar.alt = displayName;
+                    avatar.src = 'https://api.dicebear.com/8.x/initials/svg?seed=' + encodeURIComponent(displayName);
+
+                    // Extra volunteer fields
+                    document.getElementById('profilePhoneCard').textContent = (vol && vol.phone) || '—';
+                    document.getElementById('profileTransportCard').textContent = (vol && vol.transport) || '—';
+                    document.getElementById('profileAreasCard').textContent = (vol && vol.areas) || '—';
+                    document.getElementById('profileDaysCard').textContent = (vol && vol.days && vol.days.join ? vol.days.join(', ') : (vol && vol.days) || '—');
+                    const times = vol && (Array.isArray(vol.times) ? vol.times.join(', ') : vol.times);
+                    document.getElementById('profileTimesCard').textContent = times || '—';
+                } catch (_) { }
+            }
+
+            initDonationStates();
+            renderDonations();
+            renderCompleted();
+            hydrateProfile();
+            restoreStep();
+            wireEvents();
+        })();
+    </script>
+
+</body>
+
+</html>

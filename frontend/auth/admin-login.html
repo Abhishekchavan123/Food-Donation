@@ -148,20 +148,16 @@
         try {
           const meta = data.user && data.user.user_metadata ? data.user.user_metadata : {};
           const fullName = meta.full_name || meta.name || '';
-          const role = meta.role || 'user';
           const userObj = {
             email: (data.user && data.user.email) || email,
             fullName: fullName || (email && email.split('@')[0]) || 'User',
-            role: role
+            role: 'user'
           };
           localStorage.setItem('de_authUser', JSON.stringify(userObj));
-                    // Show name and role in alert
-          alert(`Login successful! Welcome ${userObj.fullName} (${userObj.role})`);
-          window.location.href = '../index.html';
         } catch (_) {}
 
-       
-       // ...existing code...
+        alert('Login successful! Redirecting...');
+        window.location.href = '../admin.html';
       } catch (err) {
         errorMsg.textContent = 'Network error. Please try again.';
         errorMsg.classList.remove('hidden');

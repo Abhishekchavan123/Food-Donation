@@ -206,11 +206,37 @@
       });
     }
 
-    openMapBtn.addEventListener('click', () => {
-      const addr = document.getElementById('pickupAddr').value.trim();
-      if (!addr) { alert('Enter pickup address first.'); return; }
-      window.open('https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(addr), '_blank');
-    });
+openMapBtn.addEventListener('click', () => {
+  const addr = document.getElementById('pickupAddr').value.trim();
+  if (!addr) {
+    alert('Enter pickup address first.');
+    return;
+  }
+
+  // Check if browser supports geolocation
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const lat = pos.coords.latitude;
+        const lon = pos.coords.longitude;
+        const destination = encodeURIComponent(addr);
+        // Build Google Maps Directions URL
+        const mapsUrl = `https://www.google.com/maps/dir/?api=1&origin=${lat},${lon}&destination=${destination}`;
+        window.open(mapsUrl, '_blank');
+      },
+      (err) => {
+        console.error(err);
+        alert("Couldn't get your location. Opening search instead.");
+        // Fallback to normal search if location fails
+        window.open('https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(addr), '_blank');
+      }
+    );
+  } else {
+    alert('Geolocation is not supported by your browser.');
+    window.open('https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(addr), '_blank');
+  }
+});
+
 
     function renderDonations() {
       const donations = loadDonations();
