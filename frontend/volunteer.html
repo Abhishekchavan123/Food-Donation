@@ -424,11 +424,18 @@
             const dashboardTop = document.getElementById('dashboardTop');
             const completedSection = document.getElementById('completedSection');
 
-            // Example active donations (can be replaced with API)
-            const donations = [
-                { id: 1, name: 'Harvest Restaurant', address: '123 Main St', qty: '20 kg', type: 'Fruits', time: 'Today 6:00 PM' },
-                { id: 2, name: 'Green Hotel', address: '789 Elm St', qty: '10 kg', type: 'Vegetables', time: 'Today 6:00 PM' }
-            ];
+            // Fetch donations from backend API
+            let donations = [];
+            async function fetchDonations() {
+                try {
+                    const res = await fetch('http://localhost:4000/api/donations');
+                    const data = await res.json();
+                    donations = data.donations || [];
+                    renderDonations();
+                } catch (err) {
+                    donationList.innerHTML = '<div class="text-red-500">Failed to load donations.</div>';
+                }
+            }
 
             // Stack implementation: Track donation states (null -> 'accepted' -> 'picked' -> 'delivered')
             const donationStates = new Map();
@@ -464,8 +471,21 @@
             }
 
             // Update donation state (stack progression)
-            function updateDonationState(donationId) {
+            async function updateDonationState(donationId) {
                 const config = getButtonConfig(donationId);
+                if (config.nextState === 'delivered') {
+                    // Update status in backend before updating UI
+                    try {
+                        await fetch(`http://localhost:4000/api/donations/${donationId}/status`, {
+                            method: 'PATCH',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ status: 'delivered' })
+                        });
+                    } catch (err) {
+                        alert('Failed to update status in backend.');
+                        return;
+                    }
+                }
                 if (config.nextState) {
                     donationStates.set(donationId, config.nextState);
                     saveDonationStates();
@@ -486,10 +506,13 @@
                 // Clear existing children
                 while (donationList.firstChild) donationList.removeChild(donationList.firstChild);
 
-                donations.forEach(d => {
-                    const config = getButtonConfig(d.id);
-                    const isDelivered = config.state === 'delivered';
+                if (!donations.length) {
+                    donationList.innerHTML = '<div class="py-10 text-center text-slate-500">No donations found.</div>';
+                    return;
+                }
 
+                donations.forEach(d => {
+                    // Use backend fields for display
                     const clone = tpl.content.cloneNode(true);
                     const nameEl = clone.querySelector('[data-name]');
                     const addrEl = clone.querySelector('[data-address]');
@@ -498,16 +521,24 @@
                     const viewBtn = clone.querySelector('[data-map]');
                     const acceptBtn = clone.querySelector('[data-accept]');
 
-                    if (nameEl) nameEl.textContent = d.name;
-                    if (addrEl) addrEl.textContent = d.address;
-                    if (qtyType) qtyType.textContent = `${d.qty} • ${d.type}`;
-                    if (timeEl) timeEl.textContent = d.time;
-                    if (viewBtn) viewBtn.setAttribute('data-map', String(d.id));
+                    // Replace with backend data
+                    if (nameEl) nameEl.textContent = d.donor_name || '';
+                    if (addrEl) addrEl.textContent = d.pickup_address || '';
+                    if (qtyType) qtyType.textContent = `${d.quantity || ''} • ${d.food_type || ''}`;
+                    if (timeEl) timeEl.textContent = d.expiry_date || '';
+                    if (viewBtn) viewBtn.setAttribute('data-map', String(d.id || ''));
                     if (acceptBtn) {
+                        // Button logic uses local donationStates
+                        const config = getButtonConfig(d.id);
+                        const isDelivered = config.state === 'delivered';
                         acceptBtn.textContent = config.text;
                         acceptBtn.className = isDelivered ? 'px-3 py-1.5 text-sm rounded-md bg-gray-400 text-white cursor-not-allowed' : 'px-3 py-1.5 text-sm rounded-md bg-green-600 text-white hover:bg-green-700';
                         if (isDelivered) acceptBtn.disabled = true;
-                        acceptBtn.setAttribute('data-accept', String(d.id));
+                        acceptBtn.setAttribute('data-accept', String(d.id || ''));
+                        acceptBtn.addEventListener('click', function(e) {
+                            e.stopPropagation();
+                            if (!isDelivered) updateDonationState(d.id);
+                        });
                     }
 
                     donationList.appendChild(clone);
@@ -738,7 +769,7 @@
             }
 
             initDonationStates();
-            renderDonations();
+            fetchDonations();
             renderCompleted();
             hydrateProfile();
             restoreStep();
