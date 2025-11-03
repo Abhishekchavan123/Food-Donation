@@ -471,21 +471,8 @@
             }
 
             // Update donation state (stack progression)
-            async function updateDonationState(donationId) {
+            function updateDonationState(donationId) {
                 const config = getButtonConfig(donationId);
-                if (config.nextState === 'delivered') {
-                    // Update status in backend before updating UI
-                    try {
-                        await fetch(`http://localhost:4000/api/donations/${donationId}/status`, {
-                            method: 'PATCH',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ status: 'delivered' })
-                        });
-                    } catch (err) {
-                        alert('Failed to update status in backend.');
-                        return;
-                    }
-                }
                 if (config.nextState) {
                     donationStates.set(donationId, config.nextState);
                     saveDonationStates();
