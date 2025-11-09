@@ -140,7 +140,7 @@
                 </button>
                 <div id="profileDropdown"
                     class="absolute right-0 mt-2 w-44 bg-white text-gray-800 rounded-md shadow-lg hidden z-50 pointer-events-auto">
-                    <a href="auth/ngo_dashboard.html"
+                    <a href="volunteer.html"
                         class="block px-4 py-2 hover:bg-gray-100 text-sm cursor-pointer">Dashboard</a>
                     <a href="auth/profile.html" id="editProfileLink"
                         class="block px-4 py-2 hover:bg-gray-100 text-sm cursor-pointer">Edit Profile</a>
@@ -209,12 +209,14 @@
                                             <p class="font-semibold text-gray-800" data-name></p>
                                             <p class="text-xs text-gray-500" data-address></p>
                                         </div>
-                                        <span class="inline-flex items-center gap-1 text-sm text-gray-600" data-qtytype></span>
+                                        <span class="inline-flex items-center gap-1 text-sm text-gray-600"
+                                            data-qtytype></span>
                                     </div>
                                     <div class="mt-3 flex items-center justify-between">
                                         <span class="text-xs text-gray-500" data-time></span>
                                         <div class="flex gap-2">
-                                            <button class="px-3 py-1.5 text-sm rounded-md bg-gray-100 hover:bg-gray-200" data-map>View on Map</button>
+                                            <button class="px-3 py-1.5 text-sm rounded-md bg-gray-100 hover:bg-gray-200"
+                                                data-map>View on Map</button>
                                             <button class="px-3 py-1.5 text-sm rounded-md" data-accept>Accept</button>
                                         </div>
                                     </div>
@@ -266,7 +268,7 @@
 
                     <!-- Task Status + Profile -->
                     <aside class="col-span-12 lg:col-span-4 space-y-6">
-                        <div class="bg-white rounded-xl shadow-sm p-4">
+                        <div id="taskStatusSection" class="bg-white rounded-xl shadow-sm p-4 hidden">
                             <h2 class="text-lg font-semibold mb-4">Task Status</h2>
                             <ol class="relative" id="statusSteps">
                                 <div class="status-progress-line" id="progressLine" style="height: 0;"></div>
@@ -458,7 +460,9 @@
 
             // Get button text and state based on current donation state
             function getButtonConfig(donationId) {
-                const state = donationStates.get(donationId);
+                // Ensure donationId is a string for consistent key matching
+                const donationIdStr = String(donationId);
+                const state = donationStates.get(donationIdStr);
                 if (!state) {
                     return { text: 'Accept Task', state: null, nextState: 'accepted' };
                 } else if (state === 'accepted') {
@@ -470,19 +474,75 @@
                 }
             }
 
-            // Update donation state (stack progression)
-            function updateDonationState(donationId) {
+            // Update donation state (stack progression). When moving to 'delivered' we update backend first.
+            async function updateDonationState(donationId) {
                 const config = getButtonConfig(donationId);
-                if (config.nextState) {
-                    donationStates.set(donationId, config.nextState);
-                    saveDonationStates();
+                if (!config || !config.nextState) return;
 
-                    // Update progress line and status steps (allow progression from button clicks)
-                    setStep(config.nextState, true, true);
-
-                    // Re-render the donations to update button text
-                    renderDonations();
+                // Ensure donationId is a string (UUIDs are strings)
+                const donationIdStr = String(donationId);
+                // Show Task Status section when a donation is accepted
+                if (config.nextState === 'accepted') {
+                    const taskStatusSection = document.getElementById('taskStatusSection');
+                    if (taskStatusSection) {
+                        taskStatusSection.classList.remove('hidden');
+                    }
                 }
+
+                // If the next state is 'delivered', call backend to persist status change
+                if (config.nextState === 'delivered') {
+                    try {
+                        const apiUrl = `http://localhost:4000/api/donations/${donationIdStr}/status`;
+                        console.log('Updating status to delivered for donation:', donationIdStr);
+                        console.log('API URL:', apiUrl);
+
+                        const resp = await fetch(apiUrl, {
+                            method: 'PATCH',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ status: 'delivered' })
+                        });
+
+                        if (!resp.ok) {
+                            let errorMessage = `Server error: ${resp.status}`;
+                            try {
+                                const errorData = await resp.json();
+                                errorMessage = errorData.error || errorData.details || errorMessage;
+                            } catch (e) {
+                                errorMessage = `HTTP ${resp.status}: ${resp.statusText}`;
+                            }
+                            throw new Error(errorMessage);
+                        }
+
+                        const result = await resp.json();
+                        console.log('Status updated successfully:', result);
+
+                        // Show success message
+                        alert('✅ Donation status updated to delivered in database!');
+                    } catch (err) {
+                        console.error('Failed to update backend status', err);
+                        let errorMsg = err.message || 'Unknown error';
+
+                        // Provide more helpful error messages
+                        if (errorMsg.includes('Failed to fetch') || errorMsg.includes('NetworkError')) {
+                            errorMsg = 'Cannot connect to server. Please ensure the backend server is running on http://localhost:4000';
+                        }
+
+                        alert('❌ Failed to update status in database:\n' + errorMsg);
+                        return; // abort local update when backend fails
+                    }
+                }
+
+                // Update local state and UI
+                donationStates.set(donationIdStr, config.nextState);
+                saveDonationStates();
+                setStep(config.nextState, true, true);
+
+                // If delivered, remove from local list because backend GET returns only available
+                if (config.nextState === 'delivered') {
+                    donations = (donations || []).filter(d => String(d.id) !== donationIdStr);
+                }
+
+                renderDonations();
             }
 
             function renderDonations() {
@@ -516,15 +576,18 @@
                     if (viewBtn) viewBtn.setAttribute('data-map', String(d.id || ''));
                     if (acceptBtn) {
                         // Button logic uses local donationStates
-                        const config = getButtonConfig(d.id);
+                        const donationIdStr = String(d.id || '');
+                        const config = getButtonConfig(donationIdStr);
                         const isDelivered = config.state === 'delivered';
                         acceptBtn.textContent = config.text;
                         acceptBtn.className = isDelivered ? 'px-3 py-1.5 text-sm rounded-md bg-gray-400 text-white cursor-not-allowed' : 'px-3 py-1.5 text-sm rounded-md bg-green-600 text-white hover:bg-green-700';
                         if (isDelivered) acceptBtn.disabled = true;
-                        acceptBtn.setAttribute('data-accept', String(d.id || ''));
-                        acceptBtn.addEventListener('click', function(e) {
+                        acceptBtn.setAttribute('data-accept', donationIdStr);
+                        acceptBtn.addEventListener('click', function (e) {
                             e.stopPropagation();
-                            if (!isDelivered) updateDonationState(d.id);
+                            if (!isDelivered) {
+                                updateDonationState(donationIdStr);
+                            }
                         });
                     }
 
@@ -657,7 +720,8 @@
                 donationList.addEventListener('click', (e) => {
                     const acceptId = e.target.getAttribute('data-accept');
                     if (acceptId) {
-                        updateDonationState(parseInt(acceptId));
+                        // Keep as string since IDs are UUIDs (strings, not integers)
+                        updateDonationState(acceptId);
                     }
                 });
                 statusSteps.addEventListener('click', (e) => {

@@ -88,4 +88,32 @@ router.get('/', async (req, res) => {
   }
 });
 
+// PATCH /api/donations/:id/status - update donation status (e.g. to 'delivered')
+router.patch('/:id/status', async (req, res) => {
+  try {
+    const id = req.params.id;
+    const { status } = req.body || {};
+
+    if (!id) return res.status(400).json({ error: 'Donation id is required in path' });
+    if (!status) return res.status(400).json({ error: 'status is required in body' });
+
+    const { data, error } = await supabase
+      .from('donations')
+      .update({ status })
+      .eq('id', id)
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Supabase update error:', error);
+      return res.status(501).json({ error: 'Failed to update donation status', details: error.message });
+    }
+
+    return res.json({ ok: true, donation: data });
+  } catch (err) {
+    console.error('Error in PATCH /api/donations/:id/status', err);
+    return res.status(500).json({ error: 'Internal server error', details: err.message });
+  }
+});
+
 module.exports = router;

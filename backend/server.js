@@ -4,7 +4,7 @@ const cors = require('cors');
 
 const app = express();
 
-app.use(cors({ origin: '*', methods: ['GET','POST','PUT','DELETE','OPTIONS'], allowedHeaders: ['Content-Type','Authorization'] }));
+app.use(cors({ origin: '*', methods: ['GET','POST','PUT','PATCH','DELETE','OPTIONS'], allowedHeaders: ['Content-Type','Authorization'] }));
 app.use(express.json());
 
 app.get('/health', (req, res) => {
@@ -19,6 +19,7 @@ app.use('/api/ngos', require('./src/routes/ngo'));
 app.use('/api/donations', require('./src/routes/donations'));
 // Contact routes
 app.use('/api/contact', require('./src/routes/contact'));
+app.use('/api/donations-A', require('./src/routes/donations-A'));
 
 const PORT = process.env.PORT || 4000;
 app.listen(PORT, () => {

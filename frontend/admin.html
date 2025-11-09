@@ -323,11 +323,18 @@
           const data = await res.json();
           window.__adminState.data.contacts = data.contacts || [];
           renderContacts(window.__adminState.data.contacts);
-        } else if (tab === "donations") {
-          const res = await fetch("http://localhost:4000/api/donations");
-          const data = await res.json();
-          window.__adminState.data.donations = data.donations || [];
-          renderDonations(window.__adminState.data.donations);
+          } else if (tab === 'donations') {
+            // Get admin token
+            const token = localStorage.getItem('access_token');
+            const res = await fetch("http://localhost:4000/api/donations-A",
+             {
+              headers: {
+                'Authorization': token || ''
+              }
+            });
+            const data = await res.json();
+            window.__adminState.data.donations = data.donations || [];
+            renderDonations(window.__adminState.data.donations);
         } else if (tab === "ngos") {
           const res = await fetch("http://localhost:4000/api/ngos/register");
           const data = await res.json();
@@ -375,6 +382,18 @@
 
     function renderDonations(donations) {
       if (!donations.length) { showEmptyState(contentMain, "No donations found."); return; }
+      
+      // Status styles for better visual feedback
+      const getStatusStyle = (status) => {
+        switch(status?.toLowerCase()) {
+          case 'available': return 'bg-green-100 text-green-800';
+          case 'accepted': return 'bg-blue-100 text-blue-800';
+          case 'picked': return 'bg-yellow-100 text-yellow-800';
+          case 'delivered': return 'bg-purple-100 text-purple-800';
+          default: return 'bg-gray-100 text-gray-800';
+        }
+      };
+      
       const rows = donations.map(d => `
         <tr class="hover:bg-slate-50">
           <td class="px-4 py-3">${escapeHtml(d.food_type)}</td>
@@ -383,7 +402,12 @@
           <td class="px-4 py-3">${escapeHtml(d.donor_name)}</td>
           <td class="px-4 py-3">${escapeHtml(d.phone_number)}</td>
           <td class="px-4 py-3">${escapeHtml(d.pickup_address)}</td>
-          <td class="px-4 py-3">${escapeHtml(d.status)}</td>
+          <td class="px-4 py-3">
+            <span class="inline-flex px-2 py-1 text-xs font-medium rounded-full ${getStatusStyle(d.status)}">
+              ${escapeHtml(d.status || 'unknown')}
+            </span>
+          </td>
+          <td class="px-4 py-3 text-sm text-gray-500">${new Date(d.created_at).toLocaleString()}</td>
         </tr>`).join('');
       contentMain.innerHTML = `
         <div class="overflow-x-auto">
@@ -466,7 +490,7 @@
             const data = await res.json();
             window.__adminState.data.contacts = data.contacts || [];
           } else if (tab === 'donations') {
-            const res = await fetch("http://localhost:4000/api/donations");
+            const res = await fetch("http://localhost:4000/api/donations-A");
             const data = await res.json();
             window.__adminState.data.donations = data.donations || [];
           } else if (tab === 'ngos') {
