@@ -11,10 +11,13 @@
 <body class="bg-gray-100">
 
   <!-- Header -->
-  <header class="bg-green-600 text-white py-4 shadow-md">
+  <header class="bg-gray-800 text-white py-4 shadow-md">
     <div class="max-w-6xl mx-auto px-4 flex justify-between items-center">
-      <h1 class="text-2xl font-bold">DonateEasy</h1>
-      <a href="index.html" class="bg-white text-green-700 px-4 py-2 rounded-lg font-semibold hover:bg-gray-200">
+      <a href="index.html" class="flex items-center gap-3">
+        <img src="./assets/logo1.jpg" alt="DonateEasy logo" class="w-10 h-10 rounded-full object-cover" width="40" height="40" loading="lazy">
+        <h1 class="text-2xl font-bold text-yellow-400">DonateEasy</h1>
+      </a>
+      <a href="index.html" class="bg-yellow-400 text-gray-800 px-4 py-2 rounded-lg font-semibold hover:bg-yellow-300">
         ⬅ Back to Home
       </a>
     </div>
@@ -99,11 +102,11 @@
 
       <!-- Final CTA for non-UPI (disabled) -->
       <div class="text-center">
-        <button> disabled
-          class="bg-green-600 text-white px-8 py-3 rounded-xl font-bold opacity-50 cursor-not-allowed">
-          Proceed to Pay
+        <button type="submit" id="submitBtn"
+          class="bg-yellow-400 text-gray-800 px-8 py-3 rounded-xl font-bold hover:bg-yellow-300 transition">
+          ✨ Submit Donation
         </button>
-        <p class="text-xs text-gray-500 mt-2">For cards/net banking, integrate a gateway (e.g., Razorpay). UPI works now.</p>
+        <p class="text-xs text-gray-500 mt-2">Select UPI payment method and choose an app to complete your donation.</p>
       </div>
     </form>
   </section>
@@ -130,6 +133,8 @@
     const qrWrap = $("#qrWrap");
     const qrCanvas = $("#qrCanvas");
     const vpaLabel = $("#vpaLabel");
+    const submitBtn = $("#submitBtn");
+    const donationForm = $("#donationForm");
 
     const APP_PACKAGES = {
       gpay:    "com.google.android.apps.nbu.paisa.user",
@@ -273,6 +278,62 @@
         alert("UPI ID copied.");
       } catch {
         alert("Copy failed.");
+      }
+    });
+
+    // Form submission
+    donationForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      
+      const name = donorName.value.trim();
+      const email = $("#donorEmail").value.trim();
+      const amt = sanitizeAmount(amountInput.value);
+      const method = paymentMethod.value;
+      
+      // Validation
+      if (!name) {
+        alert("Please enter your name.");
+        return;
+      }
+      if (!email) {
+        alert("Please enter your email.");
+        return;
+      }
+      if (!amt || Number(amt) < 10) {
+        alert("Please enter a valid amount (minimum ₹10).");
+        return;
+      }
+      if (!method) {
+        alert("Please select a payment method.");
+        return;
+      }
+      
+      try {
+        const res = await fetch('http://localhost:4000/api/donations/money', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            donor_name: name,
+            donor_email: email,
+            amount: amt,
+            payment_method: method,
+            status: 'pending'
+          })
+        });
+        const result = await res.json();
+        
+        if (!res.ok) {
+          alert(result.error || 'Donation submission failed');
+          return;
+        }
+        
+        alert('✅ Donation submitted successfully! Thank you for your generous contribution.');
+        donationForm.reset();
+        upiChooser.classList.add("hidden");
+        qrWrap.classList.add("hidden");
+      } catch (err) {
+        console.error('Submission error:', err);
+        alert('Network error. Please try again.');
       }
     });
   </script>

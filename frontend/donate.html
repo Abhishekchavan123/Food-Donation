@@ -5,12 +5,21 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Donate - DonateEase</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <script type="text/javascript"
+    src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js">
+  </script>
+  <script type="text/javascript">
+    (function(){
+       emailjs.init("0u_BNKJ2_noT_XnAK");
+    })();
+  </script>
+  <script src="script.js"></script>
 </head>
 
 <body class="bg-cover bg-center min-h-screen" style="background-image: url('https://images.unsplash.com/photo-1593113589675-77323c9fee28?q=80&w=2070&auto=format&fit=crop');">
 
-  <nav class="bg-green-700 bg-opacity-80 text-white px-6 py-4 flex justify-between items-center">
-    <h1 class="text-2xl font-bold">DonateEase</h1>
+  <nav class="bg-gray-800 bg-opacity-95 text-white px-6 py-4 flex justify-between items-center shadow-lg"">
+    <h1 class="text-2xl font-bold text-yellow-400">DonateEase</h1>
     <div class="space-x-4 flex items-center">
       <a href="index.html" class="hover:underline">Home</a>
       <span id="authLoginLink" class="inline-block">
@@ -174,6 +183,17 @@
           return;
         }
         
+        // Send email notification after successful submission
+        try {
+          const emailResult = await sendMail();
+          if (emailResult?.sent) {
+            console.log(`Email sent to ${emailResult.sent}/${emailResult.total} recipients`);
+          }
+        } catch (emailErr) {
+          console.warn('Email notification failed:', emailErr);
+          // Don't block the success message if email fails
+        }
+        
         alert('✅ Donation submitted successfully! Thank you for your contribution.');
         e.target.reset();
       } catch (err) {
@@ -183,4 +203,4 @@
   </script>
 
 </body>
-</html>
+</html>  
