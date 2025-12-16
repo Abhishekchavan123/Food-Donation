@@ -88,6 +88,26 @@ router.get('/', async (req, res) => {
   }
 });
 
+// GET /api/donations/count - get total number of donations
+router.get('/count', async (req, res) => {
+  try {
+    const { count, error } = await supabase
+      .from('donations')
+      .select('*', { count: 'exact', head: true });
+
+    if (error) {
+       console.error('Supabase count error:', error);
+       return res.status(501).json({ error: 'Failed to count donations' });
+    }
+
+    return res.json({ count });
+  } catch (err) {
+    console.error('Error in GET /api/donations/count', err);
+    return res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+
 // PATCH /api/donations/:id/status - update donation status (e.g. to 'delivered')
 router.patch('/:id/status', async (req, res) => {
   try {

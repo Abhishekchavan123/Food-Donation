@@ -1,135 +1,172 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>DonateEasy - Smart Food Donation</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        /* Background Slideshow */
-        .slideshow {
-            position: relative;
-            width: 100%;
-            height: 100vh;
-            overflow: hidden;
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DonateEasy - Smart Food Donation</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    /* Background Slideshow */
+    .slideshow {
+      position: relative;
+      width: 100%;
+      height: 100vh;
+      overflow: hidden;
+    }
 
-        .slide {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            background-size: cover;
-            background-position: center;
-            opacity: 0;
-            animation: fade 15s infinite;
-        }
+    .slide {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      background-size: cover;
+      background-position: center;
+      opacity: 0;
+      animation: fade 15s infinite;
+    }
 
-        .slide:nth-child(1) {
-            background-image: url('https://qsyyshbhsoqfaxoqdqwp.supabase.co/storage/v1/object/sign/assets/bg3.jpg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV83NmNiMWMxMC1iZmFiLTQ0NzgtOWY4My00NmIyMDgxZWIyZmMiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJhc3NldHMvYmczLmpwZyIsImlhdCI6MTc1OTQ3Mzk5MiwiZXhwIjoxNzkxMDA5OTkyfQ.s5oWyrDtgdcnlwFiS0_dLTMyTkeA_uV13sSdE_ZGIYI');
-            animation-delay: 0s;
-        }
-        .slide:nth-child(2) {
-            background-image: url('https://qsyyshbhsoqfaxoqdqwp.supabase.co/storage/v1/object/sign/assets/bg4.jpg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV83NmNiMWMxMC1iZmFiLTQ0NzgtOWY4My00NmIyMDgxZWIyZmMiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJhc3NldHMvYmc0LmpwZyIsImlhdCI6MTc1OTQ3Mzk5OSwiZXhwIjoxNzkxMDA5OTk5fQ.bIyYiFFbrs7lV238wnF6IVZvLgw7QbqkZAILBRwIAh0');
-            animation-delay: 5s;
-        }
-        .slide:nth-child(3) {
-            background-image: url('https://images.unsplash.com/photo-1504754524776-8f4f37790ca0?auto=format&fit=crop&w=1950&q=80');
-            animation-delay: 10s;
-        }
+    .slide:nth-child(1) {
+      background-image: url('https://qsyyshbhsoqfaxoqdqwp.supabase.co/storage/v1/object/sign/assets/bg3.jpg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV83NmNiMWMxMC1iZmFiLTQ0NzgtOWY4My00NmIyMDgxZWIyZmMiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJhc3NldHMvYmczLmpwZyIsImlhdCI6MTc1OTQ3Mzk5MiwiZXhwIjoxNzkxMDA5OTkyfQ.s5oWyrDtgdcnlwFiS0_dLTMyTkeA_uV13sSdE_ZGIYI');
+      animation-delay: 0s;
+    }
 
-        @keyframes fade {
-            0% { opacity: 0; }
-            10% { opacity: 1; }
-            30% { opacity: 1; }
-            40% { opacity: 0; }
-            100% { opacity: 0; }
-        }
+    .slide:nth-child(2) {
+      background-image: url('https://qsyyshbhsoqfaxoqdqwp.supabase.co/storage/v1/object/sign/assets/bg4.jpg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV83NmNiMWMxMC1iZmFiLTQ0NzgtOWY4My00NmIyMDgxZWIyZmMiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJhc3NldHMvYmc0LmpwZyIsImlhdCI6MTc1OTQ3Mzk5OSwiZXhwIjoxNzkxMDA5OTk5fQ.bIyYiFFbrs7lV238wnF6IVZvLgw7QbqkZAILBRwIAh0');
+      animation-delay: 5s;
+    }
 
-        /* Dark overlay */
-        .overlay {
-            position: absolute;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.6);
-        }
+    .slide:nth-child(3) {
+      background-image: url('https://images.unsplash.com/photo-1504754524776-8f4f37790ca0?auto=format&fit=crop&w=1950&q=80');
+      animation-delay: 10s;
+    }
 
-        /* Smooth fade-in animation for text */
-        @keyframes fadeIn {
-            0% { opacity: 0; transform: translateY(20px); }
-            100% { opacity: 1; transform: translateY(0); }
-        }
-        .fade-in {
-            animation: fadeIn 1s ease-in-out forwards;
-        }
-    </style>
+    @keyframes fade {
+      0% {
+        opacity: 0;
+      }
+
+      10% {
+        opacity: 1;
+      }
+
+      30% {
+        opacity: 1;
+      }
+
+      40% {
+        opacity: 0;
+      }
+
+      100% {
+        opacity: 0;
+      }
+    }
+
+    /* Dark overlay */
+    .overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.6);
+    }
+
+    /* Smooth fade-in animation for text */
+    @keyframes fadeIn {
+      0% {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+
+      100% {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .fade-in {
+      animation: fadeIn 1s ease-in-out forwards;
+    }
+  </style>
 </head>
+
 <body class="bg-gray-900 text-white">
 
-    <!-- Slideshow Background -->
-    <div class="slideshow">
-        <div class="slide"></div>
-        <div class="slide"></div>
-        <div class="slide"></div>
-        <div class="overlay pointer-events-none"></div>
+  <!-- Slideshow Background -->
+  <div class="slideshow">
+    <div class="slide"></div>
+    <div class="slide"></div>
+    <div class="slide"></div>
+    <div class="overlay pointer-events-none"></div>
 
-        <!-- Navbar -->
-        <nav class="relative z-50 pointer-events-auto flex justify-between items-center px-8 py-5">
-            <div class="flex items-center space-x-2">
-                <img src="https://qsyyshbhsoqfaxoqdqwp.supabase.co/storage/v1/object/sign/assets/logo1.jpg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV83NmNiMWMxMC1iZmFiLTQ0NzgtOWY4My00NmIyMDgxZWIyZmMiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJhc3NldHMvbG9nbzEuanBnIiwiaWF0IjoxNzU5Mjg3MTQwLCJleHAiOjE3OTA4MjMxNDB9.gS6qMW_rieUwiP0yFWKsFhr8J9tyYk5pkoydRr5_d6I" alt="Logo" class="w-10 h-10 animate-bounce">
-                <span class="text-3xl font-bold text-yellow-400 drop-shadow-lg">DonateEasy</span>
+    <!-- Navbar -->
+    <nav class="relative z-50 pointer-events-auto flex justify-between items-center px-8 py-5">
+      <div class="flex items-center space-x-2">
+        <img
+          src="https://qsyyshbhsoqfaxoqdqwp.supabase.co/storage/v1/object/sign/assets/logo1.jpg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV83NmNiMWMxMC1iZmFiLTQ0NzgtOWY4My00NmIyMDgxZWIyZmMiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJhc3NldHMvbG9nbzEuanBnIiwiaWF0IjoxNzU5Mjg3MTQwLCJleHAiOjE3OTA4MjMxNDB9.gS6qMW_rieUwiP0yFWKsFhr8J9tyYk5pkoydRr5_d6I"
+          alt="Logo" class="w-10 h-10 animate-bounce">
+        <span class="text-3xl font-bold text-yellow-400 drop-shadow-lg">DonateEasy</span>
 
-            </div>
-            <div class="space-x-8 text-lg flex items-center">
-                <a href="#" class="hover:text-yellow-400 transition">Home</a>
-                <a href="join-ngo.html" class="hover:text-yellow-400 transition">Join as NGO</a>
-                <a href="#about" class="hover:text-yellow-400 transition">About Us</a>
-                <a href="#contact" class="hover:text-yellow-400 transition">Contact Us</a>
-                <span id="authLoginLink" class="inline-block">
-                  <a href="auth/login.html" class="hover:text-yellow-400 transition">Login / Register</a>
-                </span>
-                <div id="profileMenuRoot" class="relative z-50 hidden">
-                  <button id="profileBtn" type="button" class="flex items-center gap-2 px-3 py-1.5 bg-white/10 hover:bg-white/20 rounded-md text-sm cursor-pointer">
-                    <span id="profileAvatar" class="inline-block w-7 h-7 rounded-full bg-yellow-400 text-black font-bold grid place-items-center">U</span>
-                    <span id="profileName" class="hidden md:inline">User</span>
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-                  </button>
-                  <div id="profileDropdown" class="absolute right-0 mt-2 w-44 bg-white text-gray-800 rounded-md shadow-lg hidden z-50 pointer-events-auto">
-                    <a href="volunteer.html" class="block px-4 py-2 hover:bg-gray-100 text-sm cursor-pointer">Dashboard</a>
-                    <a href="auth/profile.html" id="editProfileLink" class="block px-4 py-2 hover:bg-gray-100 text-sm cursor-pointer">Edit Profile</a>
-                    <div class="border-t my-1"></div>
-                    <button id="logoutBtn" type="button" class="w-full text-left block px-4 py-2 hover:bg-gray-100 text-sm text-red-600 cursor-pointer">Logout</button>
-                  </div>
-                </div>
-            </div>
-        </nav>
+      </div>
+      <div class="space-x-8 text-lg flex items-center">
+        <a href="#" class="hover:text-yellow-400 transition">Home</a>
+        <a href="join-ngo.html" class="hover:text-yellow-400 transition">Join as NGO</a>
+        <a href="#about" class="hover:text-yellow-400 transition">About Us</a>
+        <a href="#contact" class="hover:text-yellow-400 transition">Contact Us</a>
+        <span id="authLoginLink" class="inline-block">
+          <a href="auth/login.html" class="hover:text-yellow-400 transition">Login / Register</a>
+        </span>
+        <div id="profileMenuRoot" class="relative z-50 hidden">
+          <button id="profileBtn" type="button"
+            class="flex items-center gap-2 px-3 py-1.5 bg-white/10 hover:bg-white/20 rounded-md text-sm cursor-pointer">
+            <span id="profileAvatar"
+              class="inline-block w-7 h-7 rounded-full bg-yellow-400 text-black font-bold grid place-items-center">U</span>
+            <span id="profileName" class="hidden md:inline">User</span>
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+            </svg>
+          </button>
+          <div id="profileDropdown"
+            class="absolute right-0 mt-2 w-44 bg-white text-gray-800 rounded-md shadow-lg hidden z-50 pointer-events-auto">
+            <a href="volunteer.html" class="block px-4 py-2 hover:bg-gray-100 text-sm cursor-pointer">Dashboard</a>
+            <a href="auth/profile.html" id="editProfileLink"
+              class="block px-4 py-2 hover:bg-gray-100 text-sm cursor-pointer">Edit Profile</a>
+            <div class="border-t my-1"></div>
+            <button id="logoutBtn" type="button"
+              class="w-full text-left block px-4 py-2 hover:bg-gray-100 text-sm text-red-600 cursor-pointer">Logout</button>
+          </div>
+        </div>
+      </div>
+    </nav>
 
-        <!-- Hero Section -->
-        <div class="relative z-10 flex flex-col items-center justify-center text-center h-[85vh] px-6 fade-in">
-            <h1 class="text-5xl md:text-6xl font-extrabold leading-tight mb-6 text-yellow-400 drop-shadow-lg">
-                Reduce Food Waste, <br> Feed the Hungry
-            </h1>
-            <p class="text-lg md:text-xl max-w-2xl mb-8 text-gray-200">
-                Join our mission to connect surplus food from donors to those in need, making the world a better place — one meal at a time.<br>
-                “Be the reason someone sleeps with a full stomach today.”
-            </p>
-            <div class="space-x-4">
-                <a href="donate.html">
-                      <button class="bg-green-500 text-white px-6 py-3 rounded-lg hover:bg-green-600">
-                        Donate Now
-                    </button>
-                </a>
-                <!-- <href="donate_money.html" 
+    <!-- Hero Section -->
+    <div class="relative z-10 flex flex-col items-center justify-center text-center h-[85vh] px-6 fade-in">
+      <h1 class="text-5xl md:text-6xl font-extrabold leading-tight mb-6 text-yellow-400 drop-shadow-lg">
+        Reduce Food Waste, <br> Feed the Hungry
+      </h1>
+      <p class="text-lg md:text-xl max-w-2xl mb-8 text-gray-200">
+        Join our mission to connect surplus food from donors to those in need, making the world a better place — one
+        meal at a time.<br>
+        “Be the reason someone sleeps with a full stomach today.”
+      </p>
+      <div class="space-x-4">
+        <a href="donate.html">
+          <button class="bg-green-500 text-white px-6 py-3 rounded-lg hover:bg-green-600">
+            Donate Now
+          </button>
+        </a>
+        <!-- <href="donate_money.html" 
                     class="bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-xl font-bold shadow-lg">
                         💳 Donate Money
                 </a> -->
 
-                
-            </div>
-        </div>
-    </div>
 
-    <!-- About Us Section -->
-   <!-- About Us Section -->
-<section id="about"
+      </div>
+    </div>
+  </div>
+
+  <!-- About Us Section -->
+  <!-- About Us Section -->
+  <section id="about"
     class="relative min-h-screen bg-no-repeat bg-cover bg-center text-center px-6 py-20 flex items-center justify-center"
     style="background-image: url('https://qsyyshbhsoqfaxoqdqwp.supabase.co/storage/v1/object/sign/assets/FD1.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV83NmNiMWMxMC1iZmFiLTQ0NzgtOWY4My00NmIyMDgxZWIyZmMiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJhc3NldHMvRkQxLnBuZyIsImlhdCI6MTc1OTQ3NDI2MywiZXhwIjoxNzkxMDEwMjYzfQ.8uqLz6FP8bazzYLoITZPgSDfy1y_klWJC78gv47xHvY');">
 
@@ -138,272 +175,314 @@
 
     <!-- Content -->
     <div class="relative z-10 max-w-4xl mx-auto">
-        <h1 class="text-4xl font-extrabold text-yellow-400 mb-6">About Us</h1>
-        <p class="text-lg md:text-xl leading-relaxed text-gray-200">
-            DonateEasy is an innovative platform designed to bridge the gap between food donors and NGOs. 
-            Our mission is simple yet powerful: 
-            <span class="text-yellow-400 font-semibold">reduce food waste and feed the hungry</span>.  
-            Using smart technology, we connect surplus food from restaurants, hotels, events, and individuals to verified NGOs and volunteers for timely distribution.
-            <br><br>
-            From real-time food availability updates to seamless pickup scheduling, we ensure that every extra meal finds its way to someone in need.  
-            Together, we can create a world where 
-            <span class="font-semibold">no plate is wasted, and no person sleeps hungry</span>.
-        </p>
+      <h1 class="text-4xl font-extrabold text-yellow-400 mb-6">About Us</h1>
+      <p class="text-lg md:text-xl leading-relaxed text-gray-200">
+        DonateEasy is an innovative platform designed to bridge the gap between food donors and NGOs.
+        Our mission is simple yet powerful:
+        <span class="text-yellow-400 font-semibold">reduce food waste and feed the hungry</span>.
+        Using smart technology, we connect surplus food from restaurants, hotels, events, and individuals to verified
+        NGOs and volunteers for timely distribution.
+        <br><br>
+        From real-time food availability updates to seamless pickup scheduling, we ensure that every extra meal finds
+        its way to someone in need.
+        Together, we can create a world where
+        <span class="font-semibold">no plate is wasted, and no person sleeps hungry</span>.
+      </p>
     </div>
-</section>
+  </section>
 
 
-<!-- Achievements Section -->
-<section id="achievements" class="py-16 bg-gray-900 text-center px-6">
+  <!-- Achievements Section -->
+  <section id="achievements" class="py-16 bg-gray-900 text-center px-6">
     <h2 class="text-3xl font-bold text-yellow-400 mb-8">Our Achievements</h2>
     <div class="grid grid-cols-2 md:grid-cols-4 gap-8">
-        <div>
-            <h3 class="text-4xl font-extrabold text-yellow-400 counter" data-target="10000">0</h3>
-            <p class="text-gray-300">Meals Served</p>
-        </div>
-        <div>
-            <h3 class="text-4xl font-extrabold text-yellow-400 counter" data-target="50">0</h3>
-            <p class="text-gray-300">NGO Partners</p>
-        </div>
-        <div>
-            <h3 class="text-4xl font-extrabold text-yellow-400 counter" data-target="500">0</h3>
-            <p class="text-gray-300">Donors Registered</p>
-        </div>
-        <div>
-            <h3 class="text-4xl font-extrabold text-yellow-400 counter" data-target="15">0</h3>
-            <p class="text-gray-300">Cities Covered</p>
-        </div>
+      <div>
+        <h3 id="mealsServedCounter" class="text-4xl font-extrabold text-yellow-400 counter" data-target="0">0</h3>
+        <p class="text-gray-300">Meals Served</p>
+      </div>
+      <div>
+        <h3 class="text-4xl font-extrabold text-yellow-400 counter" data-target="50">0</h3>
+        <p class="text-gray-300">NGO Partners</p>
+      </div>
+      <div>
+        <h3 class="text-4xl font-extrabold text-yellow-400 counter" data-target="500">0</h3>
+        <p class="text-gray-300">Donors Registered</p>
+      </div>
+      <div>
+        <h3 class="text-4xl font-extrabold text-yellow-400 counter" data-target="15">0</h3>
+        <p class="text-gray-300">Cities Covered</p>
+      </div>
     </div>
-</section>
+  </section>
 
-<!-- Moments Gallery -->
-<section id="moments" class="py-16 bg-gray-800 text-center px-6">
+  <!-- Moments Gallery -->
+  <section id="moments" class="py-16 bg-gray-800 text-center px-6">
     <h2 class="text-3xl font-bold text-yellow-400 mb-8">Memorable Moments</h2>
 
     <div class="slider-container">
-        <div class="slider-track">
-            <img src="https://images.unsplash.com/photo-1605296867304-46d5465a13f1?auto=format&fit=crop&w=800&q=80" alt="Event 1">
-            <img src="https://images.unsplash.com/photo-1606851091671-3c28b6c66eb3?auto=format&fit=crop&w=800&q=80" alt="Event 2">
-            <img src="https://images.unsplash.com/photo-1504754524776-8f4f37790ca0?auto=format&fit=crop&w=800&q=80" alt="Event 3">
-            <img src="https://images.unsplash.com/photo-1605296867304-46d5465a13f1?auto=format&fit=crop&w=800&q=80" alt="Event 4">
-            <!-- Duplicate images for infinite loop effect -->
-            <img src="https://images.unsplash.com/photo-1605296867304-46d5465a13f1?auto=format&fit=crop&w=800&q=80" alt="Event 1">
-            <img src="https://images.unsplash.com/photo-1606851091671-3c28b6c66eb3?auto=format&fit=crop&w=800&q=80" alt="Event 2">
-            <img src="https://images.unsplash.com/photo-1504754524776-8f4f37790ca0?auto=format&fit=crop&w=800&q=80" alt="Event 3">
-            <img src="https://images.unsplash.com/photo-1605296867304-46d5465a13f1?auto=format&fit=crop&w=800&q=80" alt="Event 4">
-        </div>
+      <div class="slider-track">
+        <img src="https://images.unsplash.com/photo-1605296867304-46d5465a13f1?auto=format&fit=crop&w=800&q=80"
+          alt="Event 1">
+        <img src="https://images.unsplash.com/photo-1606851091671-3c28b6c66eb3?auto=format&fit=crop&w=800&q=80"
+          alt="Event 2">
+        <img src="https://images.unsplash.com/photo-1504754524776-8f4f37790ca0?auto=format&fit=crop&w=800&q=80"
+          alt="Event 3">
+        <img src="https://images.unsplash.com/photo-1605296867304-46d5465a13f1?auto=format&fit=crop&w=800&q=80"
+          alt="Event 4">
+        <!-- Duplicate images for infinite loop effect -->
+        <img src="https://images.unsplash.com/photo-1605296867304-46d5465a13f1?auto=format&fit=crop&w=800&q=80"
+          alt="Event 1">
+        <img src="https://images.unsplash.com/photo-1606851091671-3c28b6c66eb3?auto=format&fit=crop&w=800&q=80"
+          alt="Event 2">
+        <img src="https://images.unsplash.com/photo-1504754524776-8f4f37790ca0?auto=format&fit=crop&w=800&q=80"
+          alt="Event 3">
+        <img src="https://images.unsplash.com/photo-1605296867304-46d5465a13f1?auto=format&fit=crop&w=800&q=80"
+          alt="Event 4">
+      </div>
     </div>
-</section>
+  </section>
 
-<style>
-.slider-container {
-    overflow: hidden;
-    position: relative;
-    width: 100%;
-}
+  <style>
+    .slider-container {
+      overflow: hidden;
+      position: relative;
+      width: 100%;
+    }
 
-.slider-track {
-    display: flex;
-    animation: slide 20s linear infinite;
-}
+    .slider-track {
+      display: flex;
+      animation: slide 20s linear infinite;
+    }
 
-.slider-track img {
-    width: 250px;
-    height: 160px;
-    object-fit: cover;
-    border-radius: 10px;
-    margin-right: 16px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-}
+    .slider-track img {
+      width: 250px;
+      height: 160px;
+      object-fit: cover;
+      border-radius: 10px;
+      margin-right: 16px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    }
 
-@keyframes slide {
-    0% { transform: translateX(0); }
-    100% { transform: translateX(-50%); }
-}
-</style>
+    @keyframes slide {
+      0% {
+        transform: translateX(0);
+      }
+
+      100% {
+        transform: translateX(-50%);
+      }
+    }
+  </style>
 
 
-<!-- Counter Animation Script -->
-<script>
+  <!-- Counter Animation Script -->
+  <script>
     const counters = document.querySelectorAll('.counter');
     const speed = 200; // Lower is faster
 
-    const animateCounters = () => {
-        counters.forEach(counter => {
-            const updateCount = () => {
-                const target = +counter.getAttribute('data-target');
-                const count = +counter.innerText;
-                const increment = target / speed;
+    // Fetch real donation count
+    (async function fetchDonationCount() {
+      try {
+        // Adjust port if needed, assuming backend is on 4000
+        const res = await fetch('http://localhost:4000/api/donations/count');
+        if (!res.ok) throw new Error('Failed to fetch count');
+        const data = await res.json();
+        const count = data.count || 0;
 
-                if (count < target) {
-                    counter.innerText = Math.ceil(count + increment);
-                    setTimeout(updateCount, 20);
-                } else {
-                    counter.innerText = target.toLocaleString();
-                }
-            };
-            updateCount();
-        });
+        const mealsCounter = document.getElementById('mealsServedCounter');
+        if (mealsCounter) {
+          mealsCounter.setAttribute('data-target', count);
+          // If the user hasn't scrolled yet, this will be picked up by animateCounters later.
+          // If we want to support dynamic updates after animation, we'd need more logic, 
+          // but this covers the initial load case.
+        }
+      } catch (err) {
+        console.warn('Could not fetch donation count:', err);
+      }
+    })();
+
+    const animateCounters = () => {
+      counters.forEach(counter => {
+        const updateCount = () => {
+          const target = +counter.getAttribute('data-target');
+          const count = +counter.innerText;
+          const increment = Math.max(1, target / speed); // Ensure minimal increment is 1
+
+          if (count < target) {
+            counter.innerText = Math.ceil(count + increment);
+            setTimeout(updateCount, 20);
+          } else {
+            counter.innerText = target.toLocaleString();
+          }
+        };
+        updateCount();
+      });
     };
 
     // Trigger animation when in view
     const section = document.getElementById('achievements');
     let started = false;
-    window.addEventListener('scroll', () => {
-        const sectionTop = section.getBoundingClientRect().top;
-        const screenHeight = window.innerHeight;
-        if (!started && sectionTop < screenHeight - 50) {
-            animateCounters();
-            started = true;
-        }
-    });
-</script>
+    // Check on load in case it's already in view
+    const checkScroll = () => {
+      const sectionTop = section.getBoundingClientRect().top;
+      const screenHeight = window.innerHeight;
+      if (!started && sectionTop < screenHeight - 50) {
+        animateCounters();
+        started = true;
+      }
+    }
+    window.addEventListener('scroll', checkScroll);
+    // Also run once on load
+    document.addEventListener('DOMContentLoaded', checkScroll);
+  </script>
 
-<!-- How It Works Section -->
-<section id="how-it-works" class="py-20 bg-gray-900 text-center px-6">
-  <h2 class="text-3xl font-bold text-yellow-400 mb-12">How It Works</h2>
+  <!-- How It Works Section -->
+  <section id="how-it-works" class="py-20 bg-gray-900 text-center px-6">
+    <h2 class="text-3xl font-bold text-yellow-400 mb-12">How It Works</h2>
 
-  <div class="grid md:grid-cols-3 gap-10 max-w-6xl mx-auto">
-    <!-- Step 1 -->
-    <div class="bg-gray-800 rounded-2xl shadow-lg p-6 hover:scale-105 transform transition">
-      <img src="https://img.icons8.com/color/96/meal.png" alt="Donate Food" class="mx-auto mb-4">
-      <h3 class="text-xl font-semibold text-yellow-300 mb-2">1. Donate Food</h3>
-      <p class="text-gray-300">Individuals, restaurants, or events register surplus food to share.</p>
-    </div>
+    <div class="grid md:grid-cols-3 gap-10 max-w-6xl mx-auto">
+      <!-- Step 1 -->
+      <div class="bg-gray-800 rounded-2xl shadow-lg p-6 hover:scale-105 transform transition">
+        <img src="https://img.icons8.com/color/96/meal.png" alt="Donate Food" class="mx-auto mb-4">
+        <h3 class="text-xl font-semibold text-yellow-300 mb-2">1. Donate Food</h3>
+        <p class="text-gray-300">Individuals, restaurants, or events register surplus food to share.</p>
+      </div>
 
-    <!-- Step 2 -->
-    <div class="bg-gray-800 rounded-2xl shadow-lg p-6 hover:scale-105 transform transition">
-      <img src="https://img.icons8.com/color/96/delivery.png" alt="Pickup" class="mx-auto mb-4">
-      <h3 class="text-xl font-semibold text-yellow-300 mb-2">2. Volunteers Pick Up</h3>
-      <p class="text-gray-300">Verified NGOs and volunteers collect the food quickly and safely.</p>
-    </div>
+      <!-- Step 2 -->
+      <div class="bg-gray-800 rounded-2xl shadow-lg p-6 hover:scale-105 transform transition">
+        <img src="https://img.icons8.com/color/96/delivery.png" alt="Pickup" class="mx-auto mb-4">
+        <h3 class="text-xl font-semibold text-yellow-300 mb-2">2. Volunteers Pick Up</h3>
+        <p class="text-gray-300">Verified NGOs and volunteers collect the food quickly and safely.</p>
+      </div>
 
-    <!-- Step 3 -->
-    <div class="bg-gray-800 rounded-2xl shadow-lg p-6 hover:scale-105 transform transition">
-      <img src="/frontend/assets/Distributed.jpg" alt="Distribution" class="mx-auto mb-4">
-      <h3 class="text-xl font-semibold text-yellow-300 mb-2">3. Distribute to Needy</h3>
-      <p class="text-gray-300">Meals are distributed to families, shelters, and communities in need.</p>
-    </div>
-  </div>
-</section>
-
-
-
-    <!-- Contact Section -->
-    <section id="contact" class="py-16 bg-gray-800 text-center px-6">
-        <h2 class="text-3xl font-bold text-yellow-400 mb-6">Contact Us</h2>
-        <p class="max-w-xl mx-auto text-gray-300 mb-4">
-            Have questions or want to partner with us? Reach out!
-        </p>
-        <p class="text-gray-400">📧 Email: support@donateeasy.com</p>
-        <p class="text-gray-400">📞 Phone: +91 8050259617</p>
-    </section>
-    
-    
-
-   <!-- Footer -->
-<footer class="bg-gray-900 text-gray-400 py-8">
-  <div class="max-w-6xl mx-auto px-6 grid md:grid-cols-3 gap-8 text-center md:text-left">
-    
-    <!-- Brand -->
-    <div>
-      <h3 class="text-yellow-400 text-2xl font-bold mb-3">DonateEasy</h3>
-      <p class="text-gray-400 text-sm">Reducing food waste, feeding the hungry.<br>Together, we can make a difference.</p>
-    </div>
-
-    <!-- Quick Links -->
-    <div>
-      <h4 class="text-yellow-300 font-semibold mb-3">Quick Links</h4>
-      <ul class="space-y-2">
-        <li><a href="#" class="hover:text-yellow-400">Home</a></li>
-        <li><a href="#about" class="hover:text-yellow-400">About Us</a></li>
-        <li><a href="join-ngo.html" class="hover:text-yellow-400">Join as NGO</a></li>
-        <li><a href="#contact" class="hover:text-yellow-400">Contact</a></li>
-      </ul>
-    </div>
-
-    <!-- Social -->
-    <div>
-      <h4 class="text-yellow-300 font-semibold mb-3">Connect With Us</h4>
-      <div class="flex justify-center md:justify-start space-x-4">
-        <a href="#"><img src="https://img.icons8.com/ios-filled/30/ffffff/facebook.png" alt="Facebook"></a>
-        <a href="#"><img src="https://img.icons8.com/ios-filled/30/ffffff/instagram.png" alt="Instagram"></a>
-        <a href="#"><img src="https://img.icons8.com/ios-filled/30/ffffff/linkedin.png" alt="LinkedIn"></a>
+      <!-- Step 3 -->
+      <div class="bg-gray-800 rounded-2xl shadow-lg p-6 hover:scale-105 transform transition">
+        <img src="/frontend/assets/Distributed.jpg" alt="Distribution" class="mx-auto mb-4">
+        <h3 class="text-xl font-semibold text-yellow-300 mb-2">3. Distribute to Needy</h3>
+        <p class="text-gray-300">Meals are distributed to families, shelters, and communities in need.</p>
       </div>
     </div>
-  </div>
-
-  <div class="text-center text-sm text-gray-500 mt-6">
-    © 2025 DonateEasy. All rights reserved.
-  </div>
-</footer>
+  </section>
 
 
-<script>
-  (function setupNavProfile(){
-    const loginSpan = document.getElementById('authLoginLink');
-    const root = document.getElementById('profileMenuRoot');
-    const btn = document.getElementById('profileBtn');
-    const menu = document.getElementById('profileDropdown');
-    const avatar = document.getElementById('profileAvatar');
-    const nameEl = document.getElementById('profileName');
-    const logoutBtn = document.getElementById('logoutBtn');
-    const editProfileLink = document.getElementById('editProfileLink');
 
-    if (!loginSpan || !root) return;
-    const token = localStorage.getItem('access_token');
-    if (token) {
-      let displayName = 'User';
-      try {
-        const raw = localStorage.getItem('de_authUser');
-        if (raw) {
-          const u = JSON.parse(raw);
-          displayName = (u.fullName || u.email || 'User');
-        }
-      } catch(_) {}
-      if (avatar) avatar.textContent = displayName.charAt(0).toUpperCase();
-      if (nameEl) nameEl.textContent = displayName;
-      loginSpan.classList.add('hidden');
-      root.classList.remove('hidden');
-    } else {
-      root.classList.add('hidden');
-      loginSpan.classList.remove('hidden');
-      return;
-    }
+  <!-- Contact Section -->
+  <section id="contact" class="py-16 bg-gray-800 text-center px-6">
+    <h2 class="text-3xl font-bold text-yellow-400 mb-6">Contact Us</h2>
+    <p class="max-w-xl mx-auto text-gray-300 mb-4">
+      Have questions or want to partner with us? Reach out!
+    </p>
+    <p class="text-gray-400">📧 Email: support@donateeasy.com</p>
+    <p class="text-gray-400">📞 Phone: +91 8050259617</p>
+  </section>
 
-    function positionMenu() {
-      if (!btn || !menu) return;
-      // Temporarily show to measure
-      const wasHidden = menu.classList.contains('hidden');
-      if (wasHidden) { menu.classList.remove('hidden'); menu.style.visibility = 'hidden'; }
-      const rect = btn.getBoundingClientRect();
-      menu.style.position = 'fixed';
-      menu.style.top = (rect.bottom + 6) + 'px';
-      // Align right edges
-      const menuWidth = menu.offsetWidth || 176; // ~w-44
-      menu.style.left = Math.max(8, rect.right - menuWidth) + 'px';
-      menu.style.zIndex = 9999;
-      if (wasHidden) { menu.classList.add('hidden'); menu.style.visibility = ''; }
-    }
-    function openMenu(){ positionMenu(); menu.classList.remove('hidden'); }
-    function closeMenu(){ menu.classList.add('hidden'); }
-    function toggleMenu(){ if (menu.classList.contains('hidden')) openMenu(); else closeMenu(); }
-    if (btn) btn.addEventListener('click', (e)=>{ e.stopPropagation(); toggleMenu(); });
-    if (menu) menu.addEventListener('click', (e)=>{ e.stopPropagation(); });
-    document.addEventListener('click', (e)=>{ if (!root.contains(e.target)) closeMenu(); });
-    if (logoutBtn) logoutBtn.addEventListener('click', ()=>{
-      try { localStorage.removeItem('access_token'); } catch(_) {}
-      try { localStorage.removeItem('de_authUser'); } catch(_) {}
-      closeMenu();
-      window.location.replace('auth/login.html');
-    });
-    if (editProfileLink) editProfileLink.addEventListener('click', (e)=>{
-      e.preventDefault();
-      closeMenu();
-      window.location.href = 'auth/profile.html';
-    });
-  })();
+
+
+  <!-- Footer -->
+  <footer class="bg-gray-900 text-gray-400 py-8">
+    <div class="max-w-6xl mx-auto px-6 grid md:grid-cols-3 gap-8 text-center md:text-left">
+
+      <!-- Brand -->
+      <div>
+        <h3 class="text-yellow-400 text-2xl font-bold mb-3">DonateEasy</h3>
+        <p class="text-gray-400 text-sm">Reducing food waste, feeding the hungry.<br>Together, we can make a difference.
+        </p>
+      </div>
+
+      <!-- Quick Links -->
+      <div>
+        <h4 class="text-yellow-300 font-semibold mb-3">Quick Links</h4>
+        <ul class="space-y-2">
+          <li><a href="#" class="hover:text-yellow-400">Home</a></li>
+          <li><a href="#about" class="hover:text-yellow-400">About Us</a></li>
+          <li><a href="join-ngo.html" class="hover:text-yellow-400">Join as NGO</a></li>
+          <li><a href="#contact" class="hover:text-yellow-400">Contact</a></li>
+        </ul>
+      </div>
+
+      <!-- Social -->
+      <div>
+        <h4 class="text-yellow-300 font-semibold mb-3">Connect With Us</h4>
+        <div class="flex justify-center md:justify-start space-x-4">
+          <a href="#"><img src="https://img.icons8.com/ios-filled/30/ffffff/facebook.png" alt="Facebook"></a>
+          <a href="#"><img src="https://img.icons8.com/ios-filled/30/ffffff/instagram.png" alt="Instagram"></a>
+          <a href="#"><img src="https://img.icons8.com/ios-filled/30/ffffff/linkedin.png" alt="LinkedIn"></a>
+        </div>
+      </div>
+    </div>
+
+    <div class="text-center text-sm text-gray-500 mt-6">
+      © 2025 DonateEasy. All rights reserved.
+    </div>
+  </footer>
+
+
+  <script>
+    (function setupNavProfile() {
+      const loginSpan = document.getElementById('authLoginLink');
+      const root = document.getElementById('profileMenuRoot');
+      const btn = document.getElementById('profileBtn');
+      const menu = document.getElementById('profileDropdown');
+      const avatar = document.getElementById('profileAvatar');
+      const nameEl = document.getElementById('profileName');
+      const logoutBtn = document.getElementById('logoutBtn');
+      const editProfileLink = document.getElementById('editProfileLink');
+
+      if (!loginSpan || !root) return;
+      const token = localStorage.getItem('access_token');
+      if (token) {
+        let displayName = 'User';
+        try {
+          const raw = localStorage.getItem('de_authUser');
+          if (raw) {
+            const u = JSON.parse(raw);
+            displayName = (u.fullName || u.email || 'User');
+          }
+        } catch (_) { }
+        if (avatar) avatar.textContent = displayName.charAt(0).toUpperCase();
+        if (nameEl) nameEl.textContent = displayName;
+        loginSpan.classList.add('hidden');
+        root.classList.remove('hidden');
+      } else {
+        root.classList.add('hidden');
+        loginSpan.classList.remove('hidden');
+        return;
+      }
+
+      function positionMenu() {
+        if (!btn || !menu) return;
+        // Temporarily show to measure
+        const wasHidden = menu.classList.contains('hidden');
+        if (wasHidden) { menu.classList.remove('hidden'); menu.style.visibility = 'hidden'; }
+        const rect = btn.getBoundingClientRect();
+        menu.style.position = 'fixed';
+        menu.style.top = (rect.bottom + 6) + 'px';
+        // Align right edges
+        const menuWidth = menu.offsetWidth || 176; // ~w-44
+        menu.style.left = Math.max(8, rect.right - menuWidth) + 'px';
+        menu.style.zIndex = 9999;
+        if (wasHidden) { menu.classList.add('hidden'); menu.style.visibility = ''; }
+      }
+      function openMenu() { positionMenu(); menu.classList.remove('hidden'); }
+      function closeMenu() { menu.classList.add('hidden'); }
+      function toggleMenu() { if (menu.classList.contains('hidden')) openMenu(); else closeMenu(); }
+      if (btn) btn.addEventListener('click', (e) => { e.stopPropagation(); toggleMenu(); });
+      if (menu) menu.addEventListener('click', (e) => { e.stopPropagation(); });
+      document.addEventListener('click', (e) => { if (!root.contains(e.target)) closeMenu(); });
+      if (logoutBtn) logoutBtn.addEventListener('click', () => {
+        try { localStorage.removeItem('access_token'); } catch (_) { }
+        try { localStorage.removeItem('de_authUser'); } catch (_) { }
+        closeMenu();
+        window.location.replace('auth/login.html');
+      });
+      if (editProfileLink) editProfileLink.addEventListener('click', (e) => {
+        e.preventDefault();
+        closeMenu();
+        window.location.href = 'auth/profile.html';
+      });
+    })();
   </script>
 
 </body>
+
 </html>
