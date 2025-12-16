@@ -268,7 +268,7 @@
 
             <div class="form-row">
               <label class="label-text">Email Address</label>
-              <input name="email" type="email" placeholder="Enter your email address" required class="w-full p-3 rounded-lg input-field"/>
+              <input id="volunteerEmail" name="email" type="email" placeholder="Enter your email address" required class="w-full p-3 rounded-lg input-field"/>
             </div>
 
             <div class="form-row">
@@ -325,6 +325,21 @@
 
   <!-- Script -->
   <script>
+      // Autofill email for logged-in / previously registered users
+    document.addEventListener('DOMContentLoaded', () => {
+      try {
+        const stored = localStorage.getItem('de_authUser');
+        if (stored) {
+          const user = JSON.parse(stored);
+          const emailInput = document.getElementById('volunteerEmail');
+          if (emailInput && user && user.email) {
+            emailInput.value = user.email;
+          }
+        }
+      } catch (e) {
+        // Fail silently if localStorage or JSON parsing has issues
+      }
+    });
     document.getElementById('volunteerForm').addEventListener('submit', async function(e) {
       e.preventDefault();
 

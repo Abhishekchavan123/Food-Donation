@@ -5,7 +5,7 @@ const { supabase } = require('../supabaseClient');
 // POST /api/auth/register
 router.post('/register', async (req, res) => {
   try {
-    const { email, password, name,role } = req.body;
+    const { email, password, name, role } = req.body;
     if (!email || !password) {
       return res.status(400).json({ error: 'Email and password are required' });
     }
@@ -14,7 +14,7 @@ router.post('/register', async (req, res) => {
       email,
       password,
       options: {
-        data: name ? { full_name: name,role:role } : undefined
+        data: name ? { full_name: name, role: role } : undefined
       }
     });
     if (error) {

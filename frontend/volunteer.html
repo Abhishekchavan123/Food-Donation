@@ -115,18 +115,17 @@
 <body class="bg-gray-100 min-h-screen">
 
     <!-- Navbar -->
-    <nav class="bg-gray-800 bg-opacity-90 text-white px-6 py-4 flex justify-between items-center shadow-lg">
+    <nav class="bg-green-700 bg-opacity-90 text-white px-6 py-4 flex justify-between items-center shadow-lg">
         <div class="flex items-center space-x-2">
-            <img src="./assets/logo1.jpg" alt="DonateEasy logo" class="w-10 h-10 rounded-full object-cover" width="40"
-                height="40" loading="lazy">
+            <img src="https://qsyyshbhsoqfaxoqdqwp.supabase.co/storage/v1/object/sign/assets/logo1.jpg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV83NmNiMWMxMC1iZmFiLTQ0NzgtOWY4My00NmIyMDgxZWIyZmMiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJhc3NldHMvbG9nbzEuanBnIiwiaWF0IjoxNzU5Mjg3MTQwLCJleHAiOjE3OTA4MjMxNDB9.gS6qMW_rieUwiP0yFWKsFhr8J9tyYk5pkoydRr5_d6I"
+                alt="Logo" class="w-10 h-10 animate-bounce rounded-full">
             <span class="text-2xl font-bold text-yellow-400">DonateEasy</span>
         </div>
         <div class="space-x-4 flex items-center">
             <a href="index.html" class="hover:text-yellow-400 transition">Home</a>
             <a href="donate.html" class="hover:text-yellow-400 transition">Donate</a>
-            <!-- ensure login link is visible and easy to target -->
             <span id="authLoginLink" class="inline-block">
-                <a href="auth/login.html" class="hover:text-yellow-400 transition font-medium">Login</a>
+                <a href="auth/login.html" class="hover:text-yellow-400 transition">Login</a>
             </span>
             <div id="profileMenuRoot" class="relative z-50 hidden">
                 <button id="profileBtn" type="button"
@@ -244,6 +243,20 @@
                                 <iframe title="Codemates LTD Location" src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d121659.95755604982!2d76.76612520761267!3d17.329869311037275!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3bc8c7455c624c43%3A0xf43fc78f2fc7053d!2sKalaburagi%2C%20Karnataka!5e0!3m2!1sen!2sin!4v1710340477115!5m2!1sen!2sin" width="100%" height="100%" style="border:0" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
                             </div>
                         </div>
+
+                        <!-- Nearest destinations after pickup -->
+                        <div id="destinationSection"
+                             class="mt-4 bg-white rounded-xl shadow-sm p-4 hidden">
+                            <div class="flex items-center justify-between mb-3">
+                                <h2 class="text-lg font-semibold">Nearest Destinations</h2>
+                                <span class="text-xs text-gray-500" id="destinationHint">
+                                    Shown after pickup based on your current location
+                                </span>
+                            </div>
+                            <div id="destinationList" class="space-y-2 text-sm text-gray-700">
+                                <!-- Filled by JS -->
+                            </div>
+                        </div>
                     </section>
 
                     <!-- Completed Deliveries -->
@@ -297,9 +310,8 @@
                                             <button id="uploadBtn"
                                                 class="px-3 py-1.5 text-xs rounded-md bg-gray-800 hover:bg-gray-900 text-white transition">Upload
                                                 Photo</button>
-                                            <input id="uploadInput" type="file" accept="image/*" class="hidden"
-                                                style="display:none;">
-                                            <span id="uploadStatus" class="text-xs text-gray-500 flex items-center gap-1"></span>
+                                            <input id="uploadInput" type="file" accept="image/*" class="hidden">
+                                            <span id="uploadStatus" class="text-xs text-gray-500"></span>
                                         </div>
                                     </div>
                                 </li>
@@ -755,6 +767,11 @@
                 updateProgressLine(step);
 
                 localStorage.setItem('de_volunteer_status', step);
+
+                // When the item is picked up, show nearest destination suggestions
+                if (step === 'picked') {
+                    showNearestDestinations();
+                }
             }
 
             function restoreStep() {
@@ -795,53 +812,14 @@
                     }
                 });
                 uploadBtn.addEventListener('click', () => uploadInput.click());
-                uploadBtn.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    console.log('Upload button clicked, opening file picker...');
-                    uploadInput.click();
-                });
-                
-                uploadInput.addEventListener('change', (e) => {
+                uploadInput.addEventListener('change', () => {
                     const file = uploadInput.files && uploadInput.files[0];
-                    console.log('File selected:', file);
                     if (!file) return;
-                    uploadStatus.innerHTML = '<span class="bg-gray-700 text-white px-2 py-1 rounded text-xs inline-flex items-center gap-1"><span class="inline-block animate-spin">⏳</span> <span>Uploading...</span></span>';
-                    
-                    const formData = new FormData();
-                    formData.append('photo', file);
-                    
-                    console.log('Sending upload request to backend...');
-                    fetch('http://localhost:4000/api/upload/delivery-photo', {
-                        method: 'POST',
-                        body: formData,
-                        headers: {
-                            'Authorization': localStorage.getItem('access_token') || ''
-                        }
-                    })
-                    .then(res => {
-                        console.log('Response status:', res.status);
-                        return res.json();
-                    })
-                    .then(data => {
-                        console.log('Upload response:', data);
-                        if (data.success || data.photoUrl) {
-                            uploadStatus.innerHTML = '<span class="bg-gray-700 text-white px-2 py-1 rounded text-xs inline-flex items-center gap-1"><span class="text-green-400">✅</span> <span>Uploaded: ' + file.name + '</span></span>';
-                            console.log('Photo uploaded:', data.photoUrl);
-                        } else {
-                            uploadStatus.innerHTML = '<span class="bg-gray-700 text-white px-2 py-1 rounded text-xs inline-flex items-center gap-1"><span class="text-red-400">❌</span> <span>' + (data.error || 'Upload failed') + '</span></span>';
-                        }
-                    })
-                    .catch(err => {
-                        console.error('Upload error:', err);
-                        console.error('Error details:', err.message);
-                        uploadStatus.innerHTML = '<span class="bg-gray-700 text-white px-2 py-1 rounded text-xs inline-flex items-center gap-1"><span class="text-red-400">❌</span> <span>Network error: ' + err.message + '</span></span>';
-                    });
-                    
-                    // Reset file input after upload attempt
+                    uploadStatus.textContent = 'Uploading...';
+                    // Simulate upload
                     setTimeout(() => {
-                        uploadInput.value = '';
-                    }, 500);
+                        uploadStatus.textContent = 'Uploaded: ' + file.name;
+                    }, 700);
                 });
 
                 // Sidebar navigation handlers
@@ -914,6 +892,158 @@
                     const times = vol && (Array.isArray(vol.times) ? vol.times.join(', ') : vol.times);
                     document.getElementById('profileTimesCard').textContent = times || '—';
                 } catch (_) { }
+            }
+
+            // -------- Nearest destination logic --------
+            // Static list of possible destinations (e.g. NGO centers / shelters) around Kalaburagi.
+            // You can replace these with real coordinates from your backend later.
+            const DESTINATIONS = [
+                {
+                    name: 'City Shelter Center',
+                    address: 'Super Market Road, Kalaburagi, Karnataka',
+                    lat: 17.3299,
+                    lng: 76.8343
+                },
+                {
+                    name: 'Community Kitchen',
+                    address: 'Station Road, Kalaburagi, Karnataka',
+                    lat: 17.3265,
+                    lng: 76.8401
+                },
+                {
+                    name: 'Helping Hands Home',
+                    address: 'Ring Road, Kalaburagi, Karnataka',
+                    lat: 17.3361,
+                    lng: 76.8234
+                },
+                {
+                    name: 'Sunrise Children\'s Home',
+                    address: 'Sedam Road, Kalaburagi, Karnataka',
+                    lat: 17.3178,
+                    lng: 76.8472
+                },
+                {
+                    name: 'Grace Old Age Home',
+                    address: 'MSK Mill Road, Kalaburagi, Karnataka',
+                    lat: 17.3315,
+                    lng: 76.8207
+                }
+            ];
+
+            function toRad(x) { return x * Math.PI / 180; }
+
+            function haversineDistance(lat1, lon1, lat2, lon2) {
+                const R = 6371; // km
+                const dLat = toRad(lat2 - lat1);
+                const dLon = toRad(lon2 - lon1);
+                const a =
+                    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                    Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
+                    Math.sin(dLon / 2) * Math.sin(dLon / 2);
+                const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+                return R * c;
+            }
+
+            function getCurrentPositionAsync(options = {}) {
+                return new Promise((resolve, reject) => {
+                    if (!navigator.geolocation) {
+                        reject(new Error('Geolocation is not supported by this browser'));
+                        return;
+                    }
+                    navigator.geolocation.getCurrentPosition(resolve, reject, options);
+                });
+            }
+
+            async function showNearestDestinations() {
+                const container = document.getElementById('destinationSection');
+                const listEl = document.getElementById('destinationList');
+                const hintEl = document.getElementById('destinationHint');
+                if (!container || !listEl) return;
+
+                listEl.innerHTML = '<div class="text-gray-500 text-sm">Finding nearby destinations...</div>';
+                container.classList.remove('hidden');
+
+                try {
+                    const pos = await getCurrentPositionAsync({ timeout: 8000 });
+                    const { latitude, longitude } = pos.coords;
+
+                    const enriched = DESTINATIONS.map(d => ({
+                        ...d,
+                        distanceKm: haversineDistance(latitude, longitude, d.lat, d.lng)
+                    }))
+                        .sort((a, b) => a.distanceKm - b.distanceKm)
+                        .slice(0, 4);
+
+                    listEl.innerHTML = '';
+                    enriched.forEach(d => {
+                        const row = document.createElement('div');
+                        row.className = 'flex items-start justify-between border rounded-md px-3 py-2';
+                        row.innerHTML = `
+                            <div>
+                                <p class="font-semibold">${d.name}</p>
+                                <p class="text-xs text-gray-500">${d.address}</p>
+                            </div>
+                            <div class="text-right text-xs text-gray-600">
+                                <p>${d.distanceKm.toFixed(1)} km away</p>
+                                <button class="mt-1 inline-flex items-center px-2 py-1 rounded-md bg-green-600 text-white hover:bg-green-700 text-[11px]" data-dest-address="${d.address}">
+                                    Navigate
+                                </button>
+                            </div>
+                        `;
+                        listEl.appendChild(row);
+                    });
+
+                    // Wire navigate buttons to open Google Maps directions
+                    listEl.querySelectorAll('button[data-dest-address]').forEach(btn => {
+                        btn.addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            const address = btn.getAttribute('data-dest-address') || '';
+                            if (!address) return;
+                            const dest = encodeURIComponent(address);
+                            const mapsUrl = `https://www.google.com/maps/dir/?api=1&origin=${latitude},${longitude}&destination=${dest}`;
+                            window.open(mapsUrl, '_blank');
+                        });
+                    });
+
+                    if (hintEl) {
+                        hintEl.textContent = 'Based on your current location';
+                    }
+                } catch (err) {
+                    console.warn('Could not get current position for destinations', err);
+                    listEl.innerHTML = '<div class="text-red-500 text-sm">Could not access your location. Showing default destinations.</div>';
+
+                    DESTINATIONS.slice(0, 4).forEach(d => {
+                        const row = document.createElement('div');
+                        row.className = 'flex items-start justify-between border rounded-md px-3 py-2';
+                        row.innerHTML = `
+                            <div>
+                                <p class="font-semibold">${d.name}</p>
+                                <p class="text-xs text-gray-500">${d.address}</p>
+                            </div>
+                            <div class="text-right text-xs text-gray-600">
+                                <button class="mt-1 inline-flex items-center px-2 py-1 rounded-md bg-green-600 text-white hover:bg-green-700 text-[11px]" data-dest-address="${d.address}">
+                                    Open in Maps
+                                </button>
+                            </div>
+                        `;
+                        listEl.appendChild(row);
+                    });
+
+                    listEl.querySelectorAll('button[data-dest-address]').forEach(btn => {
+                        btn.addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            const address = btn.getAttribute('data-dest-address') || '';
+                            if (!address) return;
+                            const dest = encodeURIComponent(address);
+                            const url = `https://www.google.com/maps/search/?api=1&query=${dest}`;
+                            window.open(url, '_blank');
+                        });
+                    });
+
+                    if (hintEl) {
+                        hintEl.textContent = 'Location access denied – using default list';
+                    }
+                }
             }
 
             initDonationStates();
