@@ -72,6 +72,25 @@ router.get('/register', async (req, res) => {
   }
 });
 
+// GET /api/ngos/count - get total number of registered NGOs
+router.get('/count', async (req, res) => {
+  try {
+    const { count, error } = await supabase
+      .from('volunteer_submissions')
+      .select('*', { count: 'exact', head: true });
+
+    if (error) {
+      console.error('Supabase count error:', error);
+      return res.status(501).json({ error: 'Failed to count NGOs' });
+    }
+
+    return res.json({ count });
+  } catch (err) {
+    console.error('Error in GET /api/ngos/count', err);
+    return res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 module.exports = router;
 
 

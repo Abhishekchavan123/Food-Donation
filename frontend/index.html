@@ -201,7 +201,7 @@
         <p class="text-gray-300">Meals Served</p>
       </div>
       <div>
-        <h3 class="text-4xl font-extrabold text-yellow-400 counter" data-target="50">0</h3>
+        <h3 id="ngoPartnersCounter" class="text-4xl font-extrabold text-yellow-400 counter" data-target="0">0</h3>
         <p class="text-gray-300">NGO Partners</p>
       </div>
       <div>
@@ -292,12 +292,26 @@
         const mealsCounter = document.getElementById('mealsServedCounter');
         if (mealsCounter) {
           mealsCounter.setAttribute('data-target', count);
-          // If the user hasn't scrolled yet, this will be picked up by animateCounters later.
-          // If we want to support dynamic updates after animation, we'd need more logic, 
-          // but this covers the initial load case.
         }
       } catch (err) {
         console.warn('Could not fetch donation count:', err);
+      }
+    })();
+
+    // Fetch real NGO count
+    (async function fetchNgoCount() {
+      try {
+        const res = await fetch('http://localhost:4000/api/ngos/count');
+        if (!res.ok) throw new Error('Failed to fetch NGO count');
+        const data = await res.json();
+        const count = data.count || 0;
+
+        const ngoCounter = document.getElementById('ngoPartnersCounter');
+        if (ngoCounter) {
+          ngoCounter.setAttribute('data-target', count);
+        }
+      } catch (err) {
+        console.warn('Could not fetch NGO count:', err);
       }
     })();
 
