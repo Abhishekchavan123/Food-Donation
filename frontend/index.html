@@ -127,7 +127,8 @@
           </button>
           <div id="profileDropdown"
             class="absolute right-0 mt-2 w-44 bg-white text-gray-800 rounded-md shadow-lg hidden z-50 pointer-events-auto">
-            <a href="volunteer.html" class="block px-4 py-2 hover:bg-gray-100 text-sm cursor-pointer">Dashboard</a>
+            <a id="dashboardLink" href="volunteer.html"
+              class="block px-4 py-2 hover:bg-gray-100 text-sm cursor-pointer">Dashboard</a>
             <a href="auth/profile.html" id="editProfileLink"
               class="block px-4 py-2 hover:bg-gray-100 text-sm cursor-pointer">Edit Profile</a>
             <div class="border-t my-1"></div>
@@ -451,6 +452,20 @@
           if (raw) {
             const u = JSON.parse(raw);
             displayName = (u.fullName || u.email || 'User');
+
+            // Dashboard Link Logic based on Role
+            const dbLink = document.getElementById('dashboardLink');
+            if (dbLink) {
+              if (u.role === 'ngo') {
+                dbLink.href = 'volunteer.html';
+              } else {
+                dbLink.href = '#';
+                dbLink.addEventListener('click', (e) => {
+                  e.preventDefault();
+                  alert('Only NGOs can access the dashboard.');
+                });
+              }
+            }
           }
         } catch (_) { }
         if (avatar) avatar.textContent = displayName.charAt(0).toUpperCase();
