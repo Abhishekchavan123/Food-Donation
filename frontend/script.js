@@ -26,7 +26,7 @@ async function sendMail(){
     // Fetch all registered NGO emails
     let recipients = [];
     try {
-        const res = await fetch('http://localhost:4000/api/ngos/register');
+        const res = await fetch('https://donateeasy-backend-shxl.onrender.com/api/ngos/register');
         const data = await res.json();
         recipients = (data?.ngos || [])
             .map(r => r.email)
