@@ -49,7 +49,7 @@
         const name = document.getElementById('fullName').value.trim();
         if (!name) { alert('Please enter full name'); return; }
         try {
-          const res = await fetch('https://donateeasy-backend-shxl.onrender.com/api/auth/profile', {
+          const res = await fetch('http://localhost:4000/api/auth/profile', {
             method: 'PUT',
             headers: {
               'Content-Type': 'application/json',

@@ -171,7 +171,7 @@
       const data = Object.fromEntries(formData.entries());
 
       try {
-        const res = await fetch('https://donateeasy-backend-shxl.onrender.com/api/donations', {
+        const res = await fetch('http://localhost:4000/api/donations', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(data)
