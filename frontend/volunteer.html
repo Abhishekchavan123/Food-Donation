@@ -472,7 +472,7 @@
             let donations = [];
             async function fetchDonations() {
                 try {
-                    const res = await fetch('https://donateeasy-backend-shxl.onrender.com/api/donations');
+                    const res = await fetch('https://food-donation-2-qm3q.onrender.com/api/donations');
                     const data = await res.json();
                     donations = data.donations || [];
                     renderDonations();
@@ -534,7 +534,7 @@
                 // If the next state is 'delivered', call backend to persist status change
                 if (config.nextState === 'delivered') {
                     try {
-                        const apiUrl = `https://donateeasy-backend-shxl.onrender.com/api/donations/${donationIdStr}/status`;
+                        const apiUrl = `https://food-donation-2-qm3q.onrender.com/api/donations/${donationIdStr}/status`;
                         console.log('Updating status to delivered for donation:', donationIdStr);
                         console.log('API URL:', apiUrl);
 

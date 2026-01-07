@@ -275,9 +275,9 @@
     async function fetchStats() {
       try {
         const [cRes, dRes, nRes] = await Promise.all([
-          fetch("https://donateeasy-backend-shxl.onrender.com/api/contact"),
-          fetch("https://donateeasy-backend-shxl.onrender.com/api/donations"),
-          fetch("https://donateeasy-backend-shxl.onrender.com/api/ngos/register")
+          fetch("https://food-donation-2-qm3q.onrender.com/api/contact"),
+          fetch("https://food-donation-2-qm3q.onrender.com/api/donations"),
+          fetch("https://food-donation-2-qm3q.onrender.com/api/ngos/register")
         ]);
         const cData = await cRes.json();
         const dData = await dRes.json();
@@ -325,14 +325,14 @@
       showLoading(contentMain, `Loading ${tab}...`);
       try {
         if (tab === "contacts") {
-          const res = await fetch("https://donateeasy-backend-shxl.onrender.com/api/contact");
+          const res = await fetch("https://food-donation-2-qm3q.onrender.com/api/contact");
           const data = await res.json();
           window.__adminState.data.contacts = data.contacts || [];
           renderContacts(window.__adminState.data.contacts);
           } else if (tab === 'donations') {
             // Get admin token
             const token = localStorage.getItem('access_token');
-            const res = await fetch("https://donateeasy-backend-shxl.onrender.com/api/donations-A",
+            const res = await fetch("https://food-donation-2-qm3q.onrender.com/api/donations-A",
              {
               headers: {
                 'Authorization': token || ''
@@ -342,7 +342,7 @@
             window.__adminState.data.donations = data.donations || [];
             renderDonations(window.__adminState.data.donations);
         } else if (tab === "ngos") {
-          const res = await fetch("https://donateeasy-backend-shxl.onrender.com/api/ngos/register");
+          const res = await fetch("https://food-donation-2-qm3q.onrender.com/api/ngos/register");
           const data = await res.json();
           window.__adminState.data.ngos = data.ngos || [];
           renderNGOs(window.__adminState.data.ngos);
@@ -492,15 +492,15 @@
         // fetch only the requested tab's data (keeps backend unchanged)
         try {
           if (tab === 'contacts') {
-            const res = await fetch("https://donateeasy-backend-shxl.onrender.com/api/contact");
+            const res = await fetch("https://food-donation-2-qm3q.onrender.com/api/contact");
             const data = await res.json();
             window.__adminState.data.contacts = data.contacts || [];
           } else if (tab === 'donations') {
-            const res = await fetch("https://donateeasy-backend-shxl.onrender.com/api/donations-A");
+            const res = await fetch("https://food-donation-2-qm3q.onrender.com/api/donations-A");
             const data = await res.json();
             window.__adminState.data.donations = data.donations || [];
           } else if (tab === 'ngos') {
-            const res = await fetch("https://donateeasy-backend-shxl.onrender.com/api/ngos/register");
+            const res = await fetch("https://food-donation-2-qm3q.onrender.com/api/ngos/register");
             const data = await res.json();
             window.__adminState.data.ngos = data.ngos || [];
           }

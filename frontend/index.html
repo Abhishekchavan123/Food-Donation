@@ -285,7 +285,7 @@
     (async function fetchDonationCount() {
       try {
         // Adjust port if needed, assuming backend is on 4000
-        const res = await fetch('https://donateeasy-backend-shxl.onrender.com/api/donations/count');
+        const res = await fetch('http://localhost:4000/api/donations/count');
         if (!res.ok) throw new Error('Failed to fetch count');
         const data = await res.json();
         const count = data.count || 0;
@@ -302,7 +302,7 @@
     // Fetch real NGO count
     (async function fetchNgoCount() {
       try {
-        const res = await fetch('https://donateeasy-backend-shxl.onrender.com/api/ngos/count');
+        const res = await fetch('https://food-donation-2-qm3q.onrender.com/api/ngos/count');
         if (!res.ok) throw new Error('Failed to fetch NGO count');
         const data = await res.json();
         const count = data.count || 0;
